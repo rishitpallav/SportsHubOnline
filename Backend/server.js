@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
+const { Client } = require("@elastic/elasticsearch");
+const OpenAI = require("openai");
 
 const SportEvent = require("./SportEvent");
 const Stadium = require("./Stadium");
@@ -11,15 +13,57 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// API Keys
+/*
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * API Keys
+ *
+ *
+ *
+ *
+ *
+ */
 
 const openWeatherMapAPI = "70e49117b80f210af90236e6189abc4a";
 const ticketMasterAPI = "PjDo2OxtmjYpBdk3gi7TgXmNhWSXaxQm";
 const openAIAPIKey = "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";
 
+// declaring OpenAI funtions
+const elasticClient = new Client({
+  node: "http://localhost:9200",
+  auth: {
+    username: "elastic",
+    password: "elasticroot",
+  },
+});
+
+const openai = new OpenAI({
+  apiKey: openAIAPIKey,
+});
+
 // Global variables
 
 // REST APIs all here
+
+/*
+ *
+ *
+ * REST API for testing the server
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 
 app.get("/", async (request, response) => {
   response.status(200).send("OK");
@@ -63,6 +107,23 @@ app.get("/passAnObject", async (request, response) => {
   response.status(200).send(sportEvent.getEventDetails());
 });
 
+/*
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * REST APIs for the project
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
 app.post("/weather", async (request, response) => {
   const { ipJson } = request.body;
   const weatherJson = await getWeatherJson(ipJson.latitude, ipJson.longitude);
@@ -71,17 +132,33 @@ app.post("/weather", async (request, response) => {
 
 app.post("/sportEvents", async (request, response) => {
   const { city, sportType, startPage, endPage } = request.body;
-  // console.log(
-  //   "City: " + city,
-  //   "Sport Type: " + sportType,
-  //   "Start Page: " + startPage,
-  //   "End Page: " + endPage
-  // );
   const sportEvents = await getSportEvents(city, sportType, startPage, endPage);
   response.status(200).send(sportEvents);
 });
 
-// helper functions all here
+app.post("/stadiumDetails", async (request, response) => {
+  const { stadiumId, seatmap } = request.body;
+  const stadium = await getStadiumDetails(stadiumId, seatmap);
+  response.status(200).send(stadium);
+});
+
+app.get("/featuredSports", async (request, response) => {
+  getSportEvents("", "sport", 0, 5).then((sportEvents) => {
+    response.status(200).send(sportEvents);
+  });
+});
+
+/*
+ *
+ *
+ *
+ *
+ * Helper Functions all here
+ *
+ *
+ *
+ *
+ */
 
 getWeatherJson = async (latitude, longitude) => {
   const responses = await fetch(
@@ -98,7 +175,7 @@ getSportEvents = async (city, sportType, startPage, endPage) => {
   const ticketMasterResponse = await responses.json();
   let sportEvents = [];
 
-  console.log("Ticketmaster Response: ", ticketMasterResponse);
+  // console.log("Ticketmaster Response: ", ticketMasterResponse);
 
   if (!ticketMasterResponse._embedded) {
     return sportEvents;
@@ -114,6 +191,13 @@ getSportEvents = async (city, sportType, startPage, endPage) => {
     let minPriceRange = event.priceRanges ? event.priceRanges[0].min : 0;
     let maxPriceRange = event.priceRanges ? event.priceRanges[0].max : 0;
     let ticketLimit = event.ticketLimit ? event.ticketLimit : 100;
+    let image = "";
+    for (let eventImage of event.images) {
+      if (eventImage.width == "2048") {
+        image = eventImage.url;
+        break;
+      }
+    }
     let sportEvent = new SportEvent(
       event.id,
       event.name,
@@ -123,10 +207,10 @@ getSportEvents = async (city, sportType, startPage, endPage) => {
       startTime,
       minPriceRange,
       maxPriceRange,
-      ticketLimit
+      ticketLimit,
+      image
     );
 
-    // call a function to set the stadium details
     let seatmap = event.seatmap ? event.seatmap.staticUrl : null;
 
     sportEvent.stadium = await getStadiumDetails(

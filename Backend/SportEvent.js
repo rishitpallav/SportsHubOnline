@@ -8,7 +8,8 @@ class SportEvent {
     startTime,
     minPriceRange,
     maxPriceRange,
-    ticketLimit
+    ticketLimit,
+    image
   ) {
     this.id = id;
     this.name = name;
@@ -18,6 +19,7 @@ class SportEvent {
     this.minPriceRange = minPriceRange;
     this.maxPriceRange = maxPriceRange;
     this.ticketLimit = ticketLimit;
+    this.image = image;
   }
 
   getEventDetails() {
@@ -31,6 +33,7 @@ class SportEvent {
       minPriceRange: this.minPriceRange,
       maxPriceRange: this.maxPriceRange,
       ticketLimit: this.ticketLimit,
+      image: this.image,
     };
   }
 
@@ -44,6 +47,7 @@ class SportEvent {
     console.log("Min Price Range: " + this.minPriceRange);
     console.log("Max Price Range: " + this.maxPriceRange);
     console.log("Ticket Limit: " + this.ticketLimit);
+    console.log("Image: " + this.image);
   }
 }
 

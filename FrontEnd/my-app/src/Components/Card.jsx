@@ -1,46 +1,22 @@
-import * as React from "react";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
+import React from "react";
+import { CardActions, Button } from "@mui/material";
+const Card = ({ name, image, type, onClick }) => {
+  const handleClick = () => {
+    console.log(name);
+  };
 
-export default function ImgMediaCard() {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-        gap: "0px",
-        padding: "20px",
-      }}
-    >
-      {/* Rendering 6 instances of the ImgMediaCard component */}
-      <Card sx={{ maxWidth: 345 }}>
-        <CardMedia
-          component="img"
-          alt="Fern"
-          height="140"
-          image="https://www.themarysue.com/wp-content/uploads/2024/03/Fern-Frieren-Beyond-Journeys-End.webp"
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            Fern
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Something about Fern
-          </Typography>
-        </CardContent>
+    <div className="card" onClick={handleClick}>
+      <img src={image} alt={name} className="card-image" />
+      <div className="card-content">
+        <h3 className="card-title">{name}</h3>
+        <p className="card-type">{type}</p>
         <CardActions sx={{ justifyContent: "center" }}>
           <Button size="small">Buy Ticket</Button>
         </CardActions>
-      </Card>
-      <Card sx={{ maxWidth: 345 }}>{/* Card content */}</Card>
-      <Card sx={{ maxWidth: 345 }}>{/* Card content */}</Card>
-      <Card sx={{ maxWidth: 345 }}>{/* Card content */}</Card>
-      <Card sx={{ maxWidth: 345 }}>{/* Card content */}</Card>
-      <Card sx={{ maxWidth: 345 }}>{/* Card content */}</Card>
+      </div>
     </div>
   );
-}
+};
+
+export default Card;
