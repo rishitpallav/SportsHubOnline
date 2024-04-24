@@ -142,6 +142,12 @@ app.post("/stadiumDetails", async (request, response) => {
   response.status(200).send(stadium);
 });
 
+app.get("/featuredSports", async (request, response) => {
+  getSportEvents("", "sport", 0, 5).then((sportEvents) => {
+    response.status(200).send(sportEvents);
+  });
+});
+
 /*
  *
  *
