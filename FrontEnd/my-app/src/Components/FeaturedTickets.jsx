@@ -3,28 +3,14 @@ import Carousel from "react-bootstrap/Carousel";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-function ControlledCarousel() {
+function ControlledCarousel(props) {
   const [index, setIndex] = useState(0);
-  const [events, setEvents] = useState([]);
+  //const [events, setEvents] = useState([]);
   const [error, setError] = useState(null);
-
+  const { events } = props;
   const handleSelect = (selectedIndex, e) => {
     setIndex(selectedIndex);
   };
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:4000/featuredSports"
-        );
-        setEvents(response.data);
-      } catch (error) {
-        setError(error);
-      }
-    };
-    fetchEvents();
-  }, []);
 
   return (
     <div className="container">

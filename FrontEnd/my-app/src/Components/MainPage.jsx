@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import FeaturedTickets from "./FeaturedTickets";
 import Card from "./Card";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const MainPage = () => {
   const [userCity, setUserCity] = useState("");
   const [sportEvents, setSportEvents] = useState([]);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const [Featuredevents, setFEvents] = useState([]);
 
   useEffect(() => {
     const fetchUserCity = async () => {
@@ -34,7 +38,10 @@ const MainPage = () => {
             startPage: "0",
             endPage: "12",
           }),
-        });
+        }
+      
+      
+      );
         const data = await response.json();
         // Update the sportEvents state with the fetched data
         setSportEvents(data);
@@ -48,6 +55,19 @@ const MainPage = () => {
 
     // Call fetchUserCity when the component mounts
     fetchUserCity();
+
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:4000/featuredSports"
+        );
+        setFEvents(response.data);
+      } catch (error) {
+        setFEvents(error);
+      }
+    };
+    fetchEvents();
+
   }, []);
 
   return (
@@ -55,19 +75,18 @@ const MainPage = () => {
       <div style={{ marginBottom: "20px" }}>
         <Header />
       </div>
-      <FeaturedTickets style={{ marginTop: "20px" }} />
+      <FeaturedTickets style={{ marginTop: "20px" }} 
+      events= {Featuredevents}
+      />
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-          gridAutoRows: "minmax(50px, auto)", // Ensure rows have a minimum height of 50px
-          gridAutoColumns: "1fr",
-          gap: "20px", // Adjust the gap between grid items (both rows and columns)
-          gridRowGap: "0px", // Adjust the gap between grid rows
-          marginLeft: "auto",
-          marginRight: "auto",
-          marginTop: "20px",
+          gridTemplateColumns: "repeat(4, 1fr)", // Display 4 cards in a row
+          gap: "20px", // Adjust the gap between grid items
+          gridRowGap: "20px", // Adjust the gap between grid rows
+          justifyContent: "center", // Center align items horizontally
           maxWidth: "1200px",
+          margin: "20px auto", // Center the grid horizontally
           padding: "0px",
         }}
       >
@@ -77,6 +96,9 @@ const MainPage = () => {
             key={index}
             name={event.name}
             image={event.image}
+            stadium={event.stadium.name}
+            Date={event.startDate}
+            Time={event.startTime}
             type={event.type}
             id={event.id}
           />
