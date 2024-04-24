@@ -143,9 +143,17 @@ app.post("/stadiumDetails", async (request, response) => {
 });
 
 app.get("/featuredSports", async (request, response) => {
-  getSportEvents("", "sport", 0, 5).then((sportEvents) => {
-    response.status(200).send(sportEvents);
-  });
+  // getSportEvents("", "sport", 0, 5).then((sportEvents) => {
+  //   response.status(200).send(sportEvents);
+  // });
+  const sportEvents = await getSportEvents("", "sport", 0, 5);
+  response.status(200).send(sportEvents);
+});
+
+app.post("/getEventDetails", async (request, response) => {
+  const { eventId } = request.body;
+  const sportEvent = await getEventDetails(eventId);
+  response.status(200).send(sportEvent);
 });
 
 /*
@@ -264,6 +272,60 @@ getStadiumDetails = async (stadiumId, seatmap) => {
   );
 
   return stadium;
+};
+
+getEventDetails = async (eventId) => {
+  const responses = await fetch(
+    `https://app.ticketmaster.com/discovery/v2/events/${eventId}.json?apikey=${ticketMasterAPI}`
+  );
+  const eventResponse = await responses.json();
+  let classification = eventResponse.classifications
+    ? eventResponse.classifications[0].genre.name
+    : "";
+  let venueId = eventResponse._embedded.venues
+    ? eventResponse._embedded.venues[0].id
+    : "";
+  let startDate = eventResponse.dates.start
+    ? eventResponse.dates.start.localDate
+    : "";
+  let startTime = eventResponse.dates.start
+    ? eventResponse.dates.start.localTime
+    : "";
+  let minPriceRange = eventResponse.priceRanges
+    ? eventResponse.priceRanges[0].min
+    : 0;
+  let maxPriceRange = eventResponse.priceRanges
+    ? eventResponse.priceRanges[0].max
+    : 0;
+  let ticketLimit = eventResponse.ticketLimit ? eventResponse.ticketLimit : 100;
+  let image = "";
+  for (let eventImage of eventResponse.images) {
+    if (eventImage.width == "2048") {
+      image = eventImage.url;
+      break;
+    }
+  }
+  let sportEvent = new SportEvent(
+    eventResponse.id,
+    eventResponse.name,
+    classification,
+    venueId,
+    startDate,
+    startTime,
+    minPriceRange,
+    maxPriceRange,
+    ticketLimit,
+    image
+  );
+
+  let seatmap = eventResponse.seatmap ? eventResponse.seatmap.staticUrl : null;
+
+  sportEvent.stadium = await getStadiumDetails(
+    eventResponse._embedded.venues[0].id,
+    seatmap
+  );
+
+  return sportEvent;
 };
 
 getOpenAIRecommendations = async (searchResponse, weatherData) => {
