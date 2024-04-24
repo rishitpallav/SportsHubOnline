@@ -1,13 +1,32 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Carousel from "react-bootstrap/Carousel";
-import "bootstrap/dist/css/bootstrap.min.css"; // Make sure to import Bootstrap CSS
+import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function ControlledCarousel() {
-  const [index, setIndex] = React.useState(0);
+  const [index, setIndex] = useState(0);
+  const [events, setEvents] = useState([]);
+  const [error, setError] = useState(null);
 
   const handleSelect = (selectedIndex, e) => {
     setIndex(selectedIndex);
   };
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        // Make a GET request to fetch event data
+        const response = await axios.get("http://localhost:4000/test");
+        // Update the events state with the fetched data
+        setEvents(response.data);
+      } catch (error) {
+        // If there's an error, update the error state
+        setError(error);
+      }
+    };
+    // Call fetchEvents function when the component mounts
+    fetchEvents();
+  }, []);
 
   return (
     <div className="container">
@@ -16,51 +35,22 @@ function ControlledCarousel() {
         onSelect={handleSelect}
         className="carousel-custom"
       >
-        {/* Add custom class to Carousel */}
-        <Carousel.Item style={{ height: "300px" }}>
-          {" "}
-          {/* Set carousel height */}
-          <img
-            className="d-block w-100 img-custom"
-            src="https://i0.wp.com/inbetweendrafts.com/wp-content/uploads/2023/09/Frn_EP01_still_013.jpg?fit=1920%2C1080&ssl=1"
-            alt="First slide"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-          <Carousel.Caption>
-            <h3>First slide label</h3>
-            <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-          </Carousel.Caption>
-        </Carousel.Item>
-        <Carousel.Item style={{ height: "300px" }}>
-          {" "}
-          {/* Set carousel height */}
-          <img
-            className="d-block w-100 img-custom"
-            src="https://i0.wp.com/inbetweendrafts.com/wp-content/uploads/2023/09/Frn_EP01_still_013.jpg?fit=1920%2C1080&ssl=1"
-            alt="Second slide"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-          <Carousel.Caption>
-            <h3>Second slide label</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-          </Carousel.Caption>
-        </Carousel.Item>
-        <Carousel.Item style={{ height: "300px" }}>
-          {" "}
-          {/* Set carousel height */}
-          <img
-            className="d-block w-100 img-custom"
-            src="https://i0.wp.com/inbetweendrafts.com/wp-content/uploads/2023/09/Frn_EP01_still_013.jpg?fit=1920%2C1080&ssl=1"
-            alt="Third slide"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-          <Carousel.Caption>
-            <h3>Third slide label</h3>
-            <p>
-              Praesent commodo cursus magna, vel scelerisque nisl consectetur.
-            </p>
-          </Carousel.Caption>
-        </Carousel.Item>
+        {events.map((event, idx) => (
+          <Carousel.Item key={idx} style={{ height: "300px" }}>
+            <img
+              className="d-block w-100 img-custom"
+              src={
+                "https://a.storyblok.com/f/178900/1920x1080/bf1765e73a/frieren-beyond-journey-s-end.jpg/m/1200x0/filters:quality(95)format(webp)"
+              }
+              alt={`Event ${idx + 1}`}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+            <Carousel.Caption>
+              <h3>{event.name}</h3>
+              <p>{`${event.stadium.addressLine1}, ${event.stadium.city}, ${event.stadium.state}, ${event.stadium.country}`}</p>
+            </Carousel.Caption>
+          </Carousel.Item>
+        ))}
       </Carousel>
     </div>
   );

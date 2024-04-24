@@ -13,9 +13,9 @@ app.use(bodyParser.json());
 
 // API Keys
 
-const openWeatherMapAPI = "X";
-const ticketMasterAPI = "X";
-const openAIAPIKey = "X";
+const openWeatherMapAPI = "70e49117b80f210af90236e6189abc4a";
+const ticketMasterAPI = "PjDo2OxtmjYpBdk3gi7TgXmNhWSXaxQm";
+const openAIAPIKey = "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";
 
 // Global variables
 

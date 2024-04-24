@@ -12,7 +12,7 @@ export default function ImgMediaCard() {
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-        gap: "20px",
+        gap: "0px",
         padding: "20px",
       }}
     >
@@ -32,12 +32,10 @@ export default function ImgMediaCard() {
             Something about Fern
           </Typography>
         </CardContent>
-        <CardActions>
-          <Button size="small">Share</Button>
-          <Button size="small">Learn More</Button>
+        <CardActions sx={{ justifyContent: "center" }}>
+          <Button size="small">Buy Ticket</Button>
         </CardActions>
       </Card>
-      {/* Render more instances of the ImgMediaCard component as needed */}
       <Card sx={{ maxWidth: 345 }}>{/* Card content */}</Card>
       <Card sx={{ maxWidth: 345 }}>{/* Card content */}</Card>
       <Card sx={{ maxWidth: 345 }}>{/* Card content */}</Card>
