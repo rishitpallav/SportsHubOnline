@@ -8,6 +8,10 @@ const client = require('./elasticsearch/client');
 
 const SportEvent = require("./SportEvent");
 const Stadium = require("./Stadium");
+const Customer = require("./Customer");
+const Credentials = require("./Credentials");
+const CardInformation = require("./CardInformation");
+const Ticket = require("./Ticket");
 
 const app = express();
 // This configuration disables the 'Access-Control-Allow-Origin' header, which is the wildcard.
@@ -100,6 +104,11 @@ app.get("/getDatacustomers", async (req, res) => {
 
 app.get("/", async (request, response) => {
   response.status(200).send("OK");
+});
+
+app.get("/createCustomers", async (request, response) => {
+  let customer = await testCreateCustomers();
+  response.status(200).send(customer);
 });
 
 app.get("/test", async (request, response) => {
@@ -214,6 +223,53 @@ app.post("/recommendEvents", async (request, response) => {
  *
  *
  */
+
+testCreateCustomers = async () => {
+  try {
+    let customers = [];
+    let credentials = new Credentials("rpallav@hawk.iit.edu", "rishit123");
+    let cardInformation = new CardInformation(
+      "1234567890123456",
+      "12/23",
+      "123"
+    );
+    let tickets = new Ticket(1, "Soccer Match", "Section 1", 20, "Available");
+    let customer = new Customer(
+      "Rishit Pallav",
+      credentials,
+      "123 Main St",
+      "Chicago",
+      "IL",
+      "USA",
+      "60616",
+      ["Soccer"],
+      [tickets],
+      cardInformation
+    );
+    customers.push(customer);
+
+    credentials = new Credentials("cnemani@hawk.iit.edu", "kiran123");
+    cardInformation = new CardInformation("0123456789101112", "12/23", "123");
+    tickets = new Ticket(2, "Basketball Game", "Section 2", 30, "Available");
+    customer = new Customer(
+      "Chaitanya Nemani",
+      credentials,
+      "456 Main St",
+      "Chicago",
+      "IL",
+      "USA",
+      "60616",
+      ["Basketball"],
+      [tickets],
+      cardInformation
+    );
+    customers.push(customer);
+
+    return customers;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 getWeatherJson = async (latitude, longitude) => {
   const responses = await fetch(
