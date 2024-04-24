@@ -23,8 +23,9 @@ function ControlledCarousel() {
         setError(error);
       }
     };
-    fetchEvents();
-  }, []);
+
+    fetchEvents(); // Call fetchEvents only once when component mounts
+  }, []); // Empty dependency array ensures this effect runs only once
 
   return (
     <div className="container">
