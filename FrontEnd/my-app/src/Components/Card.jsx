@@ -1,8 +1,8 @@
 import React from "react";
 import { CardActions, Button } from "@mui/material";
-const Card = ({ name, image, type, onClick }) => {
+const Card = ({ name, image, type, onClick, id }) => {
   const handleClick = () => {
-    console.log(name);
+    console.log(id);
   };
 
   return (

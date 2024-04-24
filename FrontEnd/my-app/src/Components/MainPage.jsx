@@ -78,6 +78,7 @@ const MainPage = () => {
             name={event.name}
             image={event.image}
             type={event.type}
+            id={event.id}
           />
         ))}
       </div>
