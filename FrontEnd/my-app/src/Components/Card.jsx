@@ -1,8 +1,13 @@
 import React from "react";
 import { CardActions, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+
 const Card = ({ name, image, type, onClick, id }) => {
+  const navigate = useNavigate(); // Moved inside the component
+
   const handleClick = () => {
     console.log(id);
+    navigate("/viewevent", { state: { id } });
   };
 
   return (

@@ -1,29 +1,41 @@
+import React, { useState } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
-const sendDataToBackend = async (dataToSend) => {
+const sendDataToBackend = async (eventId, setResponseData, setError) => {
   try {
-    const response = await axios.post(
-      "http://example.com/api/endpoint",
-      dataToSend
-    );
+    console.log(eventId);
+    const response = await axios.post("http://localhost:4000/getEventDetails", {
+      eventId,
+    });
     console.log("Response from backend:", response.data);
-    return response.data; // Return the data received from the backend if needed
+    setResponseData(response.data); // Update state with response data
   } catch (error) {
     console.error("Error sending data to backend:", error);
-    throw error; // Throw the error to handle it further if needed
+    setError(error); // Set error state if an error occurs
   }
 };
 
-// Usage:
-const dataToSend = {
-  key1: "value1",
-  key2: "value2",
+const YourComponent = () => {
+  const [responseData, setResponseData] = useState(null);
+  const [error, setError] = useState(null);
+  const location = useLocation();
+  const eventId = location.state?.id;
+  const dataToSend = {
+    key1: "value1",
+    key2: "value2",
+  };
+
+  sendDataToBackend(eventId, setResponseData, setError);
+
+  return (
+    <div>
+      {/* Render response data if available */}
+      {responseData && <p>Response from backend: {responseData}</p>}
+      {/* Render error message if an error occurred */}
+      {error && <p>Error: {error.message}</p>}
+    </div>
+  );
 };
 
-sendDataToBackend(dataToSend)
-  .then((responseData) => {
-    // Handle the response data if needed
-  })
-  .catch((error) => {
-    // Handle errors if needed
-  });
+export default YourComponent;

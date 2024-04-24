@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import FeaturedTickets from "./FeaturedTickets";
 import Card from "./Card";
+import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
   const [userCity, setUserCity] = useState("");
   const [sportEvents, setSportEvents] = useState([]);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserCity = async () => {

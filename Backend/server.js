@@ -152,6 +152,7 @@ app.get("/featuredSports", async (request, response) => {
 
 app.post("/getEventDetails", async (request, response) => {
   const { eventId } = request.body;
+  console.log(eventId);
   const sportEvent = await getEventDetails(eventId);
   response.status(200).send(sportEvent);
 });
