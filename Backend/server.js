@@ -156,6 +156,17 @@ app.post("/getEventDetails", async (request, response) => {
   response.status(200).send(sportEvent);
 });
 
+app.post("/recommendEvents", async (request, response) => {
+  const { ipJson } = request.body;
+  const weatherData = await getWeatherJson(ipJson.latitude, ipJson.longitude);
+  const sportEvents = await getSportEvents(ipJson.city, "sport", 0, 10);
+  const recommendedEvents = await getOpenAIRecommendations(
+    sportEvents,
+    weatherData
+  );
+  response.status(200).send(recommendedEvents);
+});
+
 /*
  *
  *
@@ -328,16 +339,16 @@ getEventDetails = async (eventId) => {
   return sportEvent;
 };
 
-getOpenAIRecommendations = async (searchResponse, weatherData) => {
+getOpenAIRecommendations = async (sportEvents, weatherData) => {
   try {
     gptResponse = [];
     let count = 0;
-    for (let event of searchResponse._embedded.events) {
+    for (let event of sportEvents) {
       message = [
         {
           role: "system",
           content:
-            "You are a weather thoughtful event recommending bot recommending me events only saying Yes or No.",
+            "You are a weather thoughtful event recommending bot recommending me sport events only saying Yes or No.",
         },
         {
           role: "user",
@@ -345,13 +356,13 @@ getOpenAIRecommendations = async (searchResponse, weatherData) => {
             "Would you recommend me this sport event: " +
             event.name +
             " at " +
-            event._embedded._venues[0].name +
+            event.stadium.name +
             ", " +
-            event._embedded._venues[0].city.name +
+            event.stadium.city +
             ", " +
-            event._embedded._venues[0].state.name +
+            event.stadium.state +
             " of sport type: " +
-            event.classifications[0].genre.name +
+            event.type +
             " ? based on the weather: " +
             weatherData.weather[0].main +
             " return the only one word: Yes or No.",
@@ -368,69 +379,12 @@ getOpenAIRecommendations = async (searchResponse, weatherData) => {
         gptResponse.push(event);
         count++;
       }
-      if (count == 3) {
+      if (count == 4) {
         break;
       }
     }
-    resultArr = [];
-    for (let event of gptResponse) {
-      let operatingHoursString = "";
 
-      for (const day in event.operating_hours) {
-        operatingHoursString += `${
-          day.charAt(0).toUpperCase() + day.slice(1)
-        }: ${event.operating_hours[day]}\n`;
-      }
-
-      if (operatingHoursString == "") {
-        operatingHoursString =
-          "Sunday: 7 AM-11 PM Monday: 7 AM-11 PM Tuesday: 7 AM-11 PM Wednesday: 7 AM-11 PM Thursday: 7 AM-11 PM Friday: 7 AM-11 PM Saturday: 7 AM-11 PM";
-      }
-
-      // console.log(event);
-      resultArr.push({
-        type: "Music",
-        title: event.title,
-        address: event.address,
-        date: event.hours,
-        operating_hours: operatingHoursString,
-        description: event.description,
-        gps_coordinates: event.gps_coordinates,
-      });
-    }
-
-    while (count < 3) {
-      for (let event of searchResponse) {
-        let operatingHoursString = "";
-
-        for (const day in event.operating_hours) {
-          operatingHoursString += `${
-            day.charAt(0).toUpperCase() + day.slice(1)
-          }: ${event.operating_hours[day]}\n`;
-        }
-
-        if (operatingHoursString == "") {
-          operatingHoursString =
-            "Sunday: 7 AM-11 PM Monday: 7 AM-11 PM Tuesday: 7 AM-11 PM Wednesday: 7 AM-11 PM Thursday: 7 AM-11 PM Friday: 7 AM-11 PM Saturday: 7 AM-11 PM";
-        }
-
-        resultArr.push({
-          type: "Music",
-          title: event.title,
-          address: event.address,
-          date: event.hours,
-          operating_hours: operatingHoursString,
-          description: event.description,
-          gps_coordinates: event.gps_coordinates,
-        });
-        count++;
-        if (count == 3) {
-          break;
-        }
-      }
-    }
-
-    return resultArr;
+    return gptResponse;
   } catch (error) {
     console.log(error);
   }
