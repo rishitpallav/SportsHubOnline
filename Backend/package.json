@@ -1,10 +1,14 @@
-{
+{"scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "start": "nodemon server/server.js"
+},
   "dependencies": {
     "@elastic/elasticsearch": "^8.13.1",
     "cors": "^2.8.5",
     "elasticsearch": "^16.7.3",
     "express": "^4.19.2",
     "nodemailer": "^6.9.13",
+    "nodemon": "^3.1.0",
     "openai": "^4.38.3"
   }
 }

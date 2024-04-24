@@ -4,13 +4,31 @@ const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const { Client } = require("@elastic/elasticsearch");
 const OpenAI = require("openai");
+const client = require('./elasticsearch/client');
 
 const SportEvent = require("./SportEvent");
 const Stadium = require("./Stadium");
 
 const app = express();
+// This configuration disables the 'Access-Control-Allow-Origin' header, which is the wildcard.
+const corsOptions = {
+  origin: function (origin, callback) {
 
-app.use(cors());
+    // To only allow requests from your specific React app, you can uncomment the following line:
+    // if (origin === 'http://localhost:3000') {
+    //   callback(null, true);
+    // } else {
+    //   callback(new Error('Origin not allowed by CORS'));
+    // }
+    //
+    // However, the above configuration is specific to your development environment.
+    // If you want to allow requests from any origin, you may use the following line:
+    callback(null, true);
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 /*
@@ -34,13 +52,15 @@ const ticketMasterAPI = "PjDo2OxtmjYpBdk3gi7TgXmNhWSXaxQm";
 const openAIAPIKey = "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";
 
 // declaring OpenAI funtions
-const elasticClient = new Client({
-  node: "http://localhost:9200",
-  auth: {
-    username: "elastic",
-    password: "elasticroot",
-  },
-});
+// const elasticClient = new Client({
+//   node: "http://localhost:9200",
+//   auth: {
+//     username: "elastic",
+//     password: "elasticroot",
+//   },
+// });
+
+
 
 const openai = new OpenAI({
   apiKey: openAIAPIKey,
@@ -64,6 +84,19 @@ const openai = new OpenAI({
  *
  *
  */
+app.get("/getDatacustomers", async (req, res) => {
+  const body = await client.search({
+    index: "customers",
+    query: {
+      match_all: {},
+    },
+    from: 0,
+    size: 1000,
+  });
+  const data = body.hits.hits.map(hit => hit._source);
+  //console.log(data);
+  res.json(data);
+});
 
 app.get("/", async (request, response) => {
   response.status(200).send("OK");
