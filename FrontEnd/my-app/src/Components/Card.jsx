@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import { CardActions, Button, Dialog, DialogContent } from "@mui/material";
 import ConfirmationPage from "./ConfirmationPage";
+import { useNavigate } from "react-router-dom";
 
-const Card = ({ name, image, type, stadium, Date, Time }) => {
+const Card = ({ name, image, type, stadium, Date, Time, onClick, id }) => {
+  const navigate = useNavigate(); // Moved inside the component
+
+  const handleClick = () => {
+    console.log(id);
+    navigate("/viewevent", { state: { id } });
+  };
   const [open, setOpen] = useState(false);
 
   const handleButtonClick = () => {
@@ -23,9 +30,9 @@ const Card = ({ name, image, type, stadium, Date, Time }) => {
     "&:hover": {
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     },
-    display: "flex", 
-    flexDirection: "column", 
-    height: "100%", 
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
   };
 
   const cardImageStyle = {
@@ -35,7 +42,7 @@ const Card = ({ name, image, type, stadium, Date, Time }) => {
   };
 
   const cardContentStyle = {
-    flex: "1", 
+    flex: "1",
     display: "flex",
     flexDirection: "column",
     padding: "16px",
@@ -56,7 +63,7 @@ const Card = ({ name, image, type, stadium, Date, Time }) => {
   const buttonStyle = {
     color: "#fff",
     backgroundColor: "#007bff",
-    marginTop: "auto", 
+    marginTop: "auto",
   };
 
   const buttonHoverStyle = {
@@ -64,7 +71,7 @@ const Card = ({ name, image, type, stadium, Date, Time }) => {
   };
 
   return (
-    <div style={cardStyle}>
+    <div style={cardStyle} onClick={handleClick}>
       <img src={image} alt={name} style={cardImageStyle} />
       <div style={cardContentStyle}>
         <h4 style={cardTitleStyle}>{name}</h4>
@@ -80,7 +87,7 @@ const Card = ({ name, image, type, stadium, Date, Time }) => {
               size="small"
               style={buttonStyle}
               sx={{ "&:hover": buttonHoverStyle }}
-              onClick={handleButtonClick} 
+              onClick={handleButtonClick}
             >
               Buy Ticket
             </Button>
