@@ -3,12 +3,14 @@ import Header from "./Header";
 import FeaturedTickets from "./FeaturedTickets";
 import Card from "./Card";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const MainPage = () => {
   const [userCity, setUserCity] = useState("");
   const [sportEvents, setSportEvents] = useState([]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [Featuredevents, setFEvents] = useState([]);
 
   useEffect(() => {
     const fetchUserCity = async () => {
@@ -36,7 +38,10 @@ const MainPage = () => {
             startPage: "0",
             endPage: "12",
           }),
-        });
+        }
+      
+      
+      );
         const data = await response.json();
         // Update the sportEvents state with the fetched data
         setSportEvents(data);
@@ -50,6 +55,19 @@ const MainPage = () => {
 
     // Call fetchUserCity when the component mounts
     fetchUserCity();
+
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:4000/featuredSports"
+        );
+        setFEvents(response.data);
+      } catch (error) {
+        setFEvents(error);
+      }
+    };
+    fetchEvents();
+
   }, []);
 
   return (
@@ -57,7 +75,9 @@ const MainPage = () => {
       <div style={{ marginBottom: "20px" }}>
         <Header />
       </div>
-      <FeaturedTickets style={{ marginTop: "20px" }} />
+      <FeaturedTickets style={{ marginTop: "20px" }} 
+      events= {Featuredevents}
+      />
       <div
         style={{
           display: "grid",
