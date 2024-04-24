@@ -143,9 +143,11 @@ app.post("/stadiumDetails", async (request, response) => {
 });
 
 app.get("/featuredSports", async (request, response) => {
-  getSportEvents("", "sport", 0, 5).then((sportEvents) => {
-    response.status(200).send(sportEvents);
-  });
+  // getSportEvents("", "sport", 0, 5).then((sportEvents) => {
+  //   response.status(200).send(sportEvents);
+  // });
+  const sportEvents = await getSportEvents("", "sport", 0, 5);
+  response.status(200).send(sportEvents);
 });
 
 app.post("/getEventDetails", async (request, response) => {
