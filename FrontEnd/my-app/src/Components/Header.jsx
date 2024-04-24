@@ -6,18 +6,22 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
 
 export default function ButtonAppBar() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
+  const toggleDrawer = (open) => (event) => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+    setIsDrawerOpen(open);
   };
 
   return (
@@ -30,7 +34,7 @@ export default function ButtonAppBar() {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
-            onClick={handleClick}
+            onClick={toggleDrawer(true)}
           >
             <MenuIcon />
           </IconButton>
@@ -40,15 +44,26 @@ export default function ButtonAppBar() {
           <Button color="inherit">Login</Button>
         </Toolbar>
       </AppBar>
-      <Menu
-        id="simple-menu"
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
+      <Drawer
+        anchor="left"
+        open={isDrawerOpen}
+        onClose={toggleDrawer(false)}
+        onKeyDown={toggleDrawer(false)}
+        sx={{
+          "& .MuiDrawer-paper": {
+            backgroundColor: "",
+          },
+        }}
       >
-        <MenuItem onClick={handleClose}>Get openAI recommendations</MenuItem>
-        <MenuItem onClick={handleClose}>My Purchases</MenuItem>
-      </Menu>
+        <List>
+          <ListItem button onClick={toggleDrawer(false)}>
+            <ListItemText primary="Get openAI recommendations" />
+          </ListItem>
+          <ListItem button onClick={toggleDrawer(false)}>
+            <ListItemText primary="My Purchases" />
+          </ListItem>
+        </List>
+      </Drawer>
     </Box>
   );
 }
