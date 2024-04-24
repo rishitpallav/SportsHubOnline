@@ -61,15 +61,12 @@ const MainPage = () => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-          gridAutoRows: "minmax(50px, auto)", // Ensure rows have a minimum height of 50px
-          gridAutoColumns: "1fr",
-          gap: "20px", // Adjust the gap between grid items (both rows and columns)
-          gridRowGap: "0px", // Adjust the gap between grid rows
-          marginLeft: "auto",
-          marginRight: "auto",
-          marginTop: "20px",
+          gridTemplateColumns: "repeat(4, 1fr)", // Display 4 cards in a row
+          gap: "20px", // Adjust the gap between grid items
+          gridRowGap: "20px", // Adjust the gap between grid rows
+          justifyContent: "center", // Center align items horizontally
           maxWidth: "1200px",
+          margin: "20px auto", // Center the grid horizontally
           padding: "0px",
         }}
       >
@@ -79,6 +76,9 @@ const MainPage = () => {
             key={index}
             name={event.name}
             image={event.image}
+            stadium={event.stadium.name}
+            Date={event.startDate}
+            Time={event.startTime}
             type={event.type}
             id={event.id}
           />
