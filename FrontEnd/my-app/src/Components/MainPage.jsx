@@ -52,8 +52,10 @@ const MainPage = () => {
 
   return (
     <div>
-      <Header />
-      <FeaturedTickets />
+      <div style={{ marginBottom: "20px" }}>
+        <Header />
+      </div>
+      <FeaturedTickets style={{ marginTop: "20px" }} />
       <div
         style={{
           display: "grid",
