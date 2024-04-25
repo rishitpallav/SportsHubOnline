@@ -285,7 +285,6 @@ app.post("/login", async (request, response) => {
     },
   });
   const data = body.hits.hits.map((hit) => hit._source);
-  console.log(data);
   if (data.length == 0) {
     response.status(404).send("User not found");
   }
