@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const YourComponent = () => {
   const [responseData, setResponseData] = useState(null);
   const [error, setError] = useState(null);
   const location = useLocation();
   const eventId = location.state?.id;
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -30,6 +30,10 @@ const YourComponent = () => {
       fetchData();
     }
   }, [eventId]);
+
+  const handlePurchase = () => {
+    navigate("/checkoutpage");
+  };
 
   return (
     <div className="container">
@@ -90,6 +94,14 @@ const YourComponent = () => {
                 <p style={{ fontSize: "16px", marginBottom: "10px" }}>
                   Ticket Limit: {responseData.ticketLimit.info}
                 </p>
+                {/* Purchase Tickets Button */}
+                <button
+                  className="btn btn-primary"
+                  onClick={handlePurchase}
+                  style={{ fontSize: "16px" }}
+                >
+                  Purchase Tickets
+                </button>
               </div>
             )}
             {/* Render error message if an error occurred */}
