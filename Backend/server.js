@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const { Client } = require("@elastic/elasticsearch");
 const OpenAI = require("openai");
-const client = require('./elasticsearch/client');
+const client = require("./elasticsearch/client");
 
 const SportEvent = require("./SportEvent");
 const Stadium = require("./Stadium");
@@ -17,7 +17,6 @@ const app = express();
 // This configuration disables the 'Access-Control-Allow-Origin' header, which is the wildcard.
 const corsOptions = {
   origin: function (origin, callback) {
-
     // To only allow requests from your specific React app, you can uncomment the following line:
     // if (origin === 'http://localhost:3000') {
     //   callback(null, true);
@@ -64,8 +63,6 @@ const openAIAPIKey = "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";
 //   },
 // });
 
-
-
 const openai = new OpenAI({
   apiKey: openAIAPIKey,
 });
@@ -97,7 +94,7 @@ app.get("/getDatacustomers", async (req, res) => {
     from: 0,
     size: 1000,
   });
-  const data = body.hits.hits.map(hit => hit._source);
+  const data = body.hits.hits.map((hit) => hit._source);
   //console.log(data);
   res.json(data);
 });
@@ -210,6 +207,12 @@ app.post("/recommendEvents", async (request, response) => {
     weatherData
   );
   response.status(200).send(recommendedEvents);
+});
+
+app.post("/searchEvents", async (request, response) => {
+  const { searchQuery } = request.body;
+  const sportEvents = await searchEvents(searchQuery);
+  response.status(200).send(sportEvents);
 });
 
 /*
@@ -480,6 +483,82 @@ getOpenAIRecommendations = async (sportEvents, weatherData) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+getOpenAIStadiumSections = async (stadiumName) => {
+  try {
+    let message = [
+      {
+        role: "system",
+        content:
+          "You are a Stadium Seating Sections returning bot. I will be giving you a stadium name and you should return an array with the all the Sections present in the stadium. Do not just return levels, return with numbers.",
+      },
+      {
+        role: "user",
+        content: stadiumName,
+      },
+    ];
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo-16k",
+      messages: message,
+      max_tokens: 30,
+      temperature: 0.5,
+      top_p: 1,
+    });
+    return completion.choices[0].message.content;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+searchEvents = async (searchQuery) => {
+  const responses = await fetch(
+    `https://app.ticketmaster.com/discovery/v2/events.json?keyword=${searchQuery}&apikey=${ticketMasterAPI}`
+  );
+  const ticketMasterResponse = await responses.json();
+  let sportEvents = [];
+
+  for (let event of ticketMasterResponse._embedded.events) {
+    let classification = event.classifications
+      ? event.classifications[0].genre.name
+      : "";
+    let venueId = event._embedded.venues ? event._embedded.venues[0].id : "";
+    let startDate = event.dates.start ? event.dates.start.localDate : "";
+    let startTime = event.dates.start ? event.dates.start.localTime : "";
+    let minPriceRange = event.priceRanges ? event.priceRanges[0].min : 0;
+    let maxPriceRange = event.priceRanges ? event.priceRanges[0].max : 0;
+    let ticketLimit = event.ticketLimit ? event.ticketLimit : 100;
+    let image = "";
+    for (let eventImage of event.images) {
+      if (eventImage.width == "2048") {
+        image = eventImage.url;
+        break;
+      }
+    }
+    let sportEvent = new SportEvent(
+      event.id,
+      event.name,
+      classification,
+      venueId,
+      startDate,
+      startTime,
+      minPriceRange,
+      maxPriceRange,
+      ticketLimit,
+      image
+    );
+
+    let seatmap = event.seatmap ? event.seatmap.staticUrl : null;
+
+    sportEvent.stadium = await getStadiumDetails(
+      event._embedded.venues[0].id,
+      seatmap
+    );
+
+    sportEvents.push(sportEvent);
+  }
+
+  return sportEvents;
 };
 
 // Node runs on port 4000. You may want to change here if you want
