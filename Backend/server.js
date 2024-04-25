@@ -54,6 +54,28 @@ const openWeatherMapAPI = "70e49117b80f210af90236e6189abc4a";
 const ticketMasterAPI = "PjDo2OxtmjYpBdk3gi7TgXmNhWSXaxQm";
 const openAIAPIKey = "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";
 
+const allSportEventSeatMap = new Map();
+allSportEventSeatMap.set(
+  "Basketball",
+  "https://maps.ticketmaster.com/maps/geometry/3/event/0400606DE3F42486/staticImage?type=png&systemId=HOST"
+);
+allSportEventSeatMap.set(
+  "Soccer",
+  "https://maps.ticketmaster.com/maps/geometry/3/event/1C00603FA86D3B72/staticImage?type=png&systemId=HOST"
+);
+allSportEventSeatMap.set(
+  "Football",
+  "https://maps.ticketmaster.com/maps/geometry/3/event/06005D79B38B3BDB/staticImage?type=png&systemId=HOST"
+);
+allSportEventSeatMap.set(
+  "Baseball",
+  "https://mapsapi.tmol.io/maps/geometry/3/event/1E005F54A7B21CBF/staticImage?systemId=HOST&sectionLevel=true&app=PRD2663_EDP_NA&sectionColor=727272&avertaFonts=true"
+);
+allSportEventSeatMap.set(
+  "Hockey",
+  "https://mapsapi.tmol.io/maps/geometry/3/event/01006073B35531F2/staticImage?systemId=HOST&sectionLevel=true&app=PRD2663_EDP_NA&sectionColor=727272&avertaFonts=true"
+);
+
 // declaring OpenAI funtions
 // const elasticClient = new Client({
 //   node: "http://localhost:9200",
@@ -144,6 +166,12 @@ app.get("/passAnObject", async (request, response) => {
   );
   sportEvent.stadium = stadium;
   response.status(200).send(sportEvent.getEventDetails());
+});
+
+app.post("/getStadiumAdditionalInfo", async (request, response) => {
+  const { stadium, type } = request.body;
+  const stadiumInfo = await getStadiumAdditionalInfo(stadium, type);
+  response.status(200).send(stadiumInfo);
 });
 
 /*
@@ -431,7 +459,63 @@ getEventDetails = async (eventId) => {
     seatmap
   );
 
+  sportEvent.stadium = await getStadiumAdditionalInfo(
+    sportEvent.stadium,
+    sportEvent.type
+  );
+
   return sportEvent;
+};
+
+getStadiumAdditionalInfo = async (stadium, type) => {
+  let sections = [];
+  let id = stadium.id;
+  let name = stadium.name;
+  let seatmap = stadium.seatMapUrl;
+
+  const body = await client.search({
+    index: "stadiums",
+    query: {
+      match: {
+        id: stadium.id,
+      },
+    },
+  });
+  const data = body.hits.hits.map((hit) => hit._source);
+  console.log(data[0]);
+  console.log("Completed search");
+  if (data.length == 0) {
+    sectionsResponse = await getOpenAIStadiumSections(name);
+    console.log(sectionsResponse);
+    sections = JSON.parse(sectionsResponse);
+    if (
+      "https://content.resale.ticketmaster.com" ==
+      stadium.seatMapUrl.substring(0, 40)
+    ) {
+      seatmap = allSportEventSeatMap.get(type);
+    } else {
+      seatmap = stadium.seatMapUrl;
+    }
+    // insert into elastic search
+    await client.index({
+      index: "stadiums",
+      body: {
+        id: id,
+        name: name,
+        seatMapUrl: seatmap,
+        sections: sections,
+      },
+    });
+  } else {
+    sections = data[0].sections;
+    seatmap = data[0].seatMapUrl;
+  }
+
+  console.log("Sections: ", sections, "Seatmap: ", seatmap, "Name: ", name);
+
+  stadium.sections = sections;
+  stadium.seatMapUrl = seatmap;
+  return stadium;
 };
 
 getOpenAIRecommendations = async (sportEvents, weatherData) => {
@@ -501,7 +585,7 @@ getOpenAIStadiumSections = async (stadiumName) => {
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo-16k",
       messages: message,
-      max_tokens: 30,
+      max_tokens: 100,
       temperature: 0.5,
       top_p: 1,
     });
