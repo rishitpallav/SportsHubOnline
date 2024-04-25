@@ -243,6 +243,37 @@ app.post("/searchEvents", async (request, response) => {
   response.status(200).send(sportEvents);
 });
 
+app.post("/registerCustomer", async (request, response) => {
+  const {
+    name,
+    email,
+    password,
+    addressLine,
+    city,
+    state,
+    country,
+    postalCode,
+    preferences,
+  } = request.body;
+  const credentials = new Credentials(email, password);
+  const cardInformation = new CardInformation("", "", "");
+  const tickets = [];
+  const customer = new Customer(
+    name,
+    credentials,
+    addressLine,
+    city,
+    state,
+    country,
+    postalCode,
+    preferences,
+    tickets,
+    cardInformation
+  );
+  const body = await registerCustomer(customer);
+  response.status(200).send(body);
+});
+
 /*
  *
  *
@@ -643,6 +674,18 @@ searchEvents = async (searchQuery) => {
   }
 
   return sportEvents;
+};
+
+registerCustomer = async (customer) => {
+  try {
+    const body = await client.index({
+      index: "customers",
+      body: customer,
+    });
+    return body;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // Node runs on port 4000. You may want to change here if you want
