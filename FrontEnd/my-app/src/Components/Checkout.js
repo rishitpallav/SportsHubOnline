@@ -36,7 +36,12 @@ const logoStyle = {
   marginRight: "-8px",
 };
 
-export default function Checkout({ onViewOrders }) {
+export default function Checkout({
+  onViewOrders,
+  eventData,
+  numberOfTickets,
+  totalPrice,
+}) {
   const [mode, setMode] = React.useState("light");
   const defaultTheme = createTheme({ palette: { mode } });
   const [activeStep, setActiveStep] = React.useState(0);
@@ -164,7 +169,11 @@ export default function Checkout({ onViewOrders }) {
               maxWidth: 500,
             }}
           >
-            <Info totalPrice={activeStep >= 2 ? "$144.97" : "$134.98"} />
+            <Info
+              totalPrice={"$ " + totalPrice}
+              eventData={eventData}
+              numberOfTickets={numberOfTickets}
+            />
           </Box>
         </Grid>
         <Grid

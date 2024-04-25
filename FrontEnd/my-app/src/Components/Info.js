@@ -6,13 +6,14 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 
-const products = [
-  {
-    // name,
-  },
-];
+function Info({ totalPrice, eventData, numberOfTickets }) {
+  const products = [
+    {
+      name: eventData.name,
+      numberOfTickets: numberOfTickets,
+    },
+  ];
 
-function Info({ totalPrice }) {
   return (
     <React.Fragment>
       <Typography variant="subtitle2" color="text.secondary">
@@ -21,20 +22,26 @@ function Info({ totalPrice }) {
       <Typography variant="h4" gutterBottom>
         {totalPrice}
       </Typography>
-      {/* <List disablePadding>
+      <Typography variant="subtitle2" color="text.secondary">
+        Event Name and number of tickets
+      </Typography>
+      <List disablePadding>
         {products.map((product) => (
-          <ListItem key={product.name} sx={{ py: 1, px: 0 }}>
+          <ListItem
+            key={product.name}
+            sx={{ py: 1, px: 0, marginLeft: "20px" }}
+          >
             <ListItemText
               sx={{ mr: 2 }}
-              primary={product.name}
-              secondary={product.desc}
+              primary={"Event Name: " + product.name}
+              secondary={"Number of tickets:" + " " + numberOfTickets}
             />
             <Typography variant="body1" fontWeight="medium">
-              {product.price}
+              {/* {product.price} */}
             </Typography>
           </ListItem>
         ))}
-      </List> */}
+      </List>
     </React.Fragment>
   );
 }
