@@ -4,6 +4,7 @@ import MainPage from "./Components/MainPage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import TicketBuying from "./Pages/TicketBuying";
 import CheckoutPage from "./Pages/CheckoutPage";
+import SignUp from "./Pages/SignUp";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route exact path="/" element={<MainPage />} />
           <Route exact path="/viewevent" element={<TicketBuying />} />
           <Route exact path="/checkoutpage" element={<CheckoutPage />} />
+          <Route exact path="/signup" element={<SignUp />} />
         </Routes>
       </BrowserRouter>
     </div>

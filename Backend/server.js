@@ -214,13 +214,13 @@ app.get("/featuredSports", async (request, response) => {
   //   response.status(200).send(sportEvents);
   // });
   const sportEvents = await getSportEvents("", "sport", 0, 5);
-  console.log(sportEvents);
+  // console.log(sportEvents);
   response.status(200).send(sportEvents);
 });
 
 app.post("/getEventDetails", async (request, response) => {
   const { eventId } = request.body;
-  console.log(eventId);
+  // console.log(eventId);
   const sportEvent = await getEventDetails(eventId);
   // console.log(sportEvent);
   response.status(200).send(sportEvent);

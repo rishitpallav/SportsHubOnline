@@ -8,9 +8,7 @@ import Typography from "@mui/material/Typography";
 
 const products = [
   {
-    TotalAmount: "Ticket Title",
-    Tickets: "3",
-    price: "$15.00",
+    // name,
   },
 ];
 
@@ -23,7 +21,7 @@ function Info({ totalPrice }) {
       <Typography variant="h4" gutterBottom>
         {totalPrice}
       </Typography>
-      <List disablePadding>
+      {/* <List disablePadding>
         {products.map((product) => (
           <ListItem key={product.name} sx={{ py: 1, px: 0 }}>
             <ListItemText
@@ -36,7 +34,7 @@ function Info({ totalPrice }) {
             </Typography>
           </ListItem>
         ))}
-      </List>
+      </List> */}
     </React.Fragment>
   );
 }

@@ -10,9 +10,12 @@ import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
+import LoginPage from "./LoginModal";
+import { Modal } from "@mui/material";
 
 export default function ButtonAppBar() {
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -22,6 +25,14 @@ export default function ButtonAppBar() {
       return;
     }
     setIsDrawerOpen(open);
+  };
+
+  const handleLogin = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
   };
 
   return (
@@ -41,7 +52,9 @@ export default function ButtonAppBar() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             SportsHub
           </Typography>
-          <Button color="inherit">Login</Button>
+          <Button color="inherit" onClick={handleLogin}>
+            Login
+          </Button>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -64,6 +77,31 @@ export default function ButtonAppBar() {
           </ListItem>
         </List>
       </Drawer>
+      <Modal
+        open={isLoginModalOpen}
+        onClose={handleCloseLoginModal}
+        aria-labelledby="recommendation-modal-title"
+        aria-describedby="recommendation-modal-description"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box
+          sx={{
+            width: "30%", // Adjust the width as needed
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+            maxHeight: "85vh", // Set max height to 80% of viewport height
+            overflow: "auto", // Enable scrolling if content exceeds maxHeight
+          }}
+        >
+          <LoginPage />
+        </Box>
+      </Modal>
     </Box>
   );
 }

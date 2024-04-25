@@ -4,7 +4,7 @@ import ConfirmationPage from "./ConfirmationPage";
 import { useNavigate } from "react-router-dom";
 
 const Card = ({ name, image, type, stadium, Date, Time, onClick, id }) => {
-  const navigate = useNavigate(); // Moved inside the component
+  const navigate = useNavigate();
 
   const handleClick = () => {
     console.log(id);
@@ -94,7 +94,6 @@ const Card = ({ name, image, type, stadium, Date, Time, onClick, id }) => {
           </CardActions>
         </div>
       </div>
-
     </div>
   );
 };
