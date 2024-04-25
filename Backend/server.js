@@ -270,8 +270,31 @@ app.post("/registerCustomer", async (request, response) => {
     tickets,
     cardInformation
   );
-  const body = await registerCustomer(customer);
+  // const body = await registerCustomer(customer);
   response.status(200).send(body);
+});
+
+app.post("/login", async (request, response) => {
+  const { email, password } = request.body;
+  const body = await client.search({
+    index: "customers",
+    query: {
+      match: {
+        "credentials.email": email,
+      },
+    },
+  });
+  const data = body.hits.hits.map((hit) => hit._source);
+  console.log(data);
+  if (data.length == 0) {
+    response.status(404).send("User not found");
+  }
+  const customer = data[0];
+  if (customer.credentials.password === password) {
+    response.status(200).send(customer);
+  } else {
+    response.status(401).send("Invalid password");
+  }
 });
 
 /*
