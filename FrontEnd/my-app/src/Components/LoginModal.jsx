@@ -14,7 +14,8 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
-function SignIn() {
+function SignIn(props) {
+  const { handleCloseLoginModal } = props;
   const navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -30,15 +31,24 @@ function SignIn() {
           email: data.get("email"),
           password: data.get("password"),
         }),
-      });
-
-      if (response.ok) {
-        console.log("Data sent to backend successfully");
-        // Handle any additional actions upon successful data submission
-      } else {
-        console.error("Failed to send data to backend");
-        // Handle failed data submission
-      }
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          //   console.log(data);
+          const dataresponse = {
+            name: data.name,
+            email: data.credentials.email,
+          };
+          const serializedData = JSON.stringify(dataresponse);
+          localStorage.setItem("userData", serializedData);
+          const retrievedData = localStorage.getItem("userData");
+          console.log(retrievedData);
+          handleCloseLoginModal();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          return [];
+        });
     } catch (error) {
       console.error("Error occurred:", error);
       // Handle errors

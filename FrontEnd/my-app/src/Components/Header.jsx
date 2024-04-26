@@ -12,10 +12,12 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import LoginPage from "./LoginModal";
 import { Modal } from "@mui/material";
+import { useEffect } from "react";
 
 export default function ButtonAppBar() {
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
+  const [userData, setUserData] = React.useState({});
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -31,9 +33,22 @@ export default function ButtonAppBar() {
     setIsLoginModalOpen(true);
   };
 
+  const handleLogout = () => {
+    // Clear user details from local storage and state
+    localStorage.removeItem("userData");
+    setUserData(null);
+  };
+
   const handleCloseLoginModal = () => {
     setIsLoginModalOpen(false);
   };
+
+  useEffect(() => {
+    // console.log("userData changed:", storedUserData);
+    const storedUserData = localStorage.getItem("userData");
+    setUserData(storedUserData);
+    console.log(userData);
+  }, [isLoginModalOpen]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -52,9 +67,20 @@ export default function ButtonAppBar() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             SportsHub
           </Typography>
-          <Button color="inherit" onClick={handleLogin}>
-            Login
-          </Button>
+          {userData ? (
+            <>
+              <Typography variant="body1" sx={{ mr: 2 }}>
+                {"Rishit"}
+              </Typography>
+              <Button color="inherit" onClick={handleLogout}>
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button color="inherit" onClick={handleLogin}>
+              Login
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -99,7 +125,7 @@ export default function ButtonAppBar() {
             overflow: "auto", // Enable scrolling if content exceeds maxHeight
           }}
         >
-          <LoginPage />
+          <LoginPage handleCloseLoginModal={handleCloseLoginModal} />
         </Box>
       </Modal>
     </Box>

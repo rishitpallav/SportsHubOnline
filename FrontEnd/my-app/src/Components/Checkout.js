@@ -13,6 +13,9 @@ import StepLabel from "@mui/material/StepLabel";
 import Stepper from "@mui/material/Stepper";
 import Typography from "@mui/material/Typography";
 
+import ConfirmationPage from "./ConfirmationPage";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
@@ -26,6 +29,7 @@ import PaymentForm from "./PaymentForm";
 import Review from "./Review";
 import ToggleColorMode from "./ToggleColorMode";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const steps = ["Payment address", "Payment details", "Review your order"];
 
@@ -46,6 +50,7 @@ export default function Checkout({
   const defaultTheme = createTheme({ palette: { mode } });
   const [activeStep, setActiveStep] = React.useState(0);
   const [orderInfo, setOrderInfo] = React.useState({});
+  const [open, setOpen] = useState(false); // State to control the dialog open/close
 
   const toggleColorMode = () => {
     setMode((prev) => (prev === "dark" ? "light" : "dark"));
@@ -58,12 +63,25 @@ export default function Checkout({
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
+  const handleClose = () => {
+    setOpen(false); // Close the dialog
+  };
 
   const handlePlaceOrder = () => {
     // Log the order information
-    console.log("Order Information:", orderInfo);
+    setOpen(true);
+    console.log("Order Information:", formData);
+    // return (
+    //   <ConfirmationPage
+    //     eventName={eventData.name}
+    //     eventDate={eventData.startDate}
+    //     eventLocation={eventData.stadium.name}
+    //     ticketType={eventData.type}
+    //     totalPrice={totalPrice}
+    //   />
+    // );
     // Pass the order information to the parent component
-    onViewOrders(orderInfo);
+    // onViewOrders(orderInfo);
   };
 
   // Function to update order information
@@ -81,7 +99,7 @@ export default function Checkout({
     // Proceed to the next step
     handleNext();
   };
-
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -98,7 +116,7 @@ export default function Checkout({
     ExpirationDate: "",
   });
   useEffect(() => {
-    console.log(formData);
+    // console.log(formData);
   }, [formData]);
 
   const handleChange = (event) => {
@@ -108,6 +126,9 @@ export default function Checkout({
       ...prevFormData,
       [name]: value,
     }));
+  };
+  const handleHomeChange = (event) => {
+    navigate("/");
   };
 
   const getStepContent = (step) => {
@@ -154,10 +175,10 @@ export default function Checkout({
             <Button
               startIcon={<ArrowBackRoundedIcon />}
               component="a"
-              href="/material-ui/getting-started/templates/landing-page/"
+              href="http://localhost:3000"
               sx={{ ml: "-8px" }}
             >
-              Back to
+              Back to Home Page
             </Button>
           </Box>
           <Box
@@ -319,22 +340,33 @@ export default function Checkout({
             </Stepper>
             {activeStep === steps.length ? (
               <Stack spacing={2} useFlexGap>
-                <Typography variant="h1">📦</Typography>
+                <Typography variant="h1">🎫</Typography>
                 <Typography variant="h5">Thank you for your order!</Typography>
                 <Typography variant="body1" color="text.secondary">
                   Your order number is
-                  <strong>&nbsp;#140396</strong>. We have emailed your order
-                  confirmation and will update you once its shipped.
+                  <strong>&nbsp;#140396</strong>. We have emailed your Ticket
+                  confirmation and will notify you once the event is about to
+                  start
                 </Typography>
                 <Button
                   variant="contained"
-                  onClick={() => handlePlaceOrder(orderInfo)}
+                  onClick={() => handlePlaceOrder()}
                   sx={{
                     alignSelf: "start",
                     width: { xs: "100%", sm: "auto" },
                   }}
                 >
-                  Go to my orders
+                  View Order QR Code
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => handleHomeChange()}
+                  sx={{
+                    alignSelf: "start",
+                    width: { xs: "100%", sm: "auto" },
+                  }}
+                >
+                  GO to home page
                 </Button>
               </Stack>
             ) : (
@@ -397,6 +429,19 @@ export default function Checkout({
           </Box>
         </Grid>
       </Grid>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogContent>
+          <ConfirmationPage
+            eventName={eventData.name}
+            eventDate={eventData.startDate}
+            eventLocation={eventData.stadium.name}
+            ticketType={eventData.type}
+            totalPrice={totalPrice}
+            Price={totalPrice}
+            onClose={handleClose}
+          />
+        </DialogContent>
+      </Dialog>
     </ThemeProvider>
   );
 }

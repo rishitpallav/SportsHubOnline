@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import Header from "../Components/Header";
 
 const YourComponent = () => {
   const [responseData, setResponseData] = useState(null);
@@ -29,18 +30,26 @@ const YourComponent = () => {
           setSelectedLevel(response.data.stadium.sections[0]);
         }
         // Set default values for ticket limit and price range if they are null or zero
-        if (!response.data || !response.data.ticketLimit || !response.data.ticketLimit.info) {
+        if (
+          !response.data ||
+          !response.data.ticketLimit ||
+          !response.data.ticketLimit.info
+        ) {
           setMaxNumberOfTickets(10);
         } else {
           const ticketLimitText = response.data.ticketLimit.info;
           const maxTickets = parseInt(ticketLimitText.match(/\d+/)[0]);
           setMaxNumberOfTickets(maxTickets);
         }
-        if (!response.data || !response.data.minPriceRange || !response.data.maxPriceRange) {
+        if (
+          !response.data ||
+          !response.data.minPriceRange ||
+          !response.data.maxPriceRange
+        ) {
           setResponseData({
             ...response.data,
             minPriceRange: 40,
-            maxPriceRange: 400
+            maxPriceRange: 400,
           });
         }
       } catch (error) {
@@ -87,6 +96,7 @@ const YourComponent = () => {
 
   return (
     <div className="container" style={{ marginTop: "50px" }}>
+      <Header />
       <div className="row">
         {responseData && responseData.stadium && (
           <div className="col-md-6">
@@ -112,10 +122,8 @@ const YourComponent = () => {
                   </p>
                   <p className="event-info">
                     <span className="info-label">Location:</span>{" "}
-                    {responseData.stadium.name},{" "}
-                    {responseData.stadium.city},{" "}
-                    {responseData.stadium.state},{" "}
-                    {responseData.stadium.country}
+                    {responseData.stadium.name}, {responseData.stadium.city},{" "}
+                    {responseData.stadium.state}, {responseData.stadium.country}
                   </p>
                   <p className="event-info">
                     <span className="info-label">Date:</span>{" "}
@@ -127,12 +135,13 @@ const YourComponent = () => {
                   </p>
                   <p className="event-info">
                     <span className="info-label">Price Range:</span> $
-                    {responseData.minPriceRange} - $
-                    {responseData.maxPriceRange}
+                    {responseData.minPriceRange} - ${responseData.maxPriceRange}
                   </p>
                   <p className="event-info">
                     <span className="info-label">Ticket Limit:</span>{" "}
-                    {responseData.ticketLimit && responseData.ticketLimit.info ? responseData.ticketLimit.info : "10"}
+                    {responseData.ticketLimit && responseData.ticketLimit.info
+                      ? responseData.ticketLimit.info
+                      : "10"}
                   </p>
                 </div>
                 {/* Ticket Selection Panel */}
@@ -184,11 +193,7 @@ const YourComponent = () => {
               </div>
             )}
             {/* Render error message if an error occurred */}
-            {error && (
-              <p className="error-message">
-                Error: {error.message}
-              </p>
-            )}
+            {error && <p className="error-message">Error: {error.message}</p>}
           </div>
         </div>
       </div>
