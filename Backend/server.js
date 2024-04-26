@@ -296,6 +296,74 @@ app.post("/login", async (request, response) => {
   }
 });
 
+app.post("/purchaseTicket", async (request, response) => {
+  const { email, event, section, price, ticketId, numTickets } = request.body;
+  const customerBody = await client.search({
+    index: "customers",
+    query: {
+      match: {
+        "credentials.email": email,
+      },
+    },
+  });
+  const customerData = customerBody.hits.hits.map((hit) => hit._source);
+  // console.log(customerData);
+  if (customerData.length == 0) {
+    response.status(404).send("Customer not found");
+  }
+  const customer = customerData[0];
+  customer.tickets.push({
+    id: ticketId,
+    eventId: event.id,
+    eventName: event.name,
+    eventDate: event.startDate,
+    section: section,
+    price: price,
+    numTickets: numTickets,
+    status: "Purchased",
+  });
+  // console.log(customer.tickets);
+  const body = await client.updateByQuery({
+    index: "customers",
+    query: {
+      bool: {
+        must: [
+          { match: { "credentials.email": email } },
+          { match: { "credentials.password": customer.credentials.password } },
+        ],
+      },
+    },
+    script: {
+      source: "ctx._source.tickets = params.tickets",
+      params: {
+        tickets: customer.tickets,
+      },
+    },
+  });
+
+  sendPurchaseConfirmation(customer, event, section, price, numTickets);
+
+  response.status(200).send(body);
+});
+
+app.post("/getPurchases", async (request, response) => {
+  const { email } = request.body;
+  const body = await client.search({
+    index: "customers",
+    query: {
+      match: {
+        "credentials.email": email,
+      },
+    },
+  });
+  const data = body.hits.hits.map((hit) => hit._source);
+  if (data.length == 0) {
+    response.status(404).send("User not found");
+  }
+  const customer = data[0];
+  response.status(200).send(customer.tickets);
+});
+
 /*
  *
  *
@@ -317,7 +385,14 @@ testCreateCustomers = async () => {
       "12/23",
       "123"
     );
-    let tickets = new Ticket(1, "Soccer Match", "Section 1", 20, "Available");
+    let tickets = new Ticket(
+      1,
+      "Soccer Match",
+      "Section 1",
+      200,
+      1,
+      "Available"
+    );
     let customer = new Customer(
       "Rishit Pallav",
       credentials,
@@ -334,7 +409,14 @@ testCreateCustomers = async () => {
 
     credentials = new Credentials("cnemani@hawk.iit.edu", "kiran123");
     cardInformation = new CardInformation("0123456789101112", "12/23", "123");
-    tickets = new Ticket(2, "Basketball Game", "Section 2", 30, "Available");
+    tickets = new Ticket(
+      2,
+      "Basketball Game",
+      "Section 2",
+      300,
+      5,
+      "Available"
+    );
     customer = new Customer(
       "Chaitanya Nemani",
       credentials,
@@ -705,6 +787,157 @@ registerCustomer = async (customer) => {
       body: customer,
     });
     return body;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+sendPurchaseConfirmation = async (
+  customer,
+  event,
+  section,
+  price,
+  numTickets
+) => {
+  try {
+    let message = `
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmation Email</title>
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif; /* Use Open Sans font */
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8; /* Lighter background color */
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background-color: #38a3a5; /* Use a more vibrant green */
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+    .content {
+      padding: 20px;
+    }
+    .ticket-info {
+      margin-bottom: 20px;
+    }
+    .ticket-info h2 {
+      margin-top: 0;
+      color: #38a3a5; /* Match header color */
+      font-size: 24px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .ticket-details {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .ticket-details td, .ticket-details th {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    .ticket-details th {
+      background-color: #38a3a5;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #a0a0a0;
+    }
+    .footer p {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Thank You for Your Purchase!</h1>
+    </div>
+    <div class="content">
+      <p>Hello ${customer.name}!,</p>
+      <p>You have successfully purchased ${numTickets} tickets for the event <strong>${event.name}</strong>.</p>
+      <div class="ticket-info">
+        <h2>Ticket Details:</h2>
+        <table class="ticket-details">
+          <thead>
+            <tr>
+              <th>Section</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${section}</td>
+              <td>$${price}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Thank you for your purchase!</p>
+    </div>
+    <div class="footer">
+      <p>&copy; 2024 Sports Hub Online</p>
+    </div>
+  </div>
+</body>
+</html>
+
+
+    `;
+    await sendEmail(
+      customer.credentials.email,
+      "Ticket Purchase Confirmation",
+      message
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+sendEmail = async (email, subject, message) => {
+  try {
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "rishitpallav6@gmail.com",
+        pass: "obpabqxlladiihgk",
+      },
+    });
+
+    let mailOptions = {
+      from: "rishitpallav6@gmail.com",
+      to: email,
+      subject: subject,
+      html: message,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
   } catch (error) {
     console.log(error);
   }
