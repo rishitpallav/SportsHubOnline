@@ -93,7 +93,7 @@ const MainPage = () => {
       <FeaturedTickets style={{ marginTop: "20px" }} events={Featuredevents} />
       <div style={{ width: "100%", margin: "40px", textAlign: "center" }}>
         <h2>
-          <b>Recommended Events Events Based on Location and Weather</b>
+          <b>Recommended Events Based on Location and Weather</b>
         </h2>
       </div>
       <div
@@ -120,6 +120,8 @@ const MainPage = () => {
             Time={event.startTime}
             type={event.type}
             id={event.id}
+            latitude={event.stadium.latitude}
+            longitude={event.stadium.longitude}
           />
         ))}
       </div>
