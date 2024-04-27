@@ -11,16 +11,69 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import LoginPage from "./LoginModal";
-import { Modal, Select, MenuItem } from "@mui/material";
+import { Modal, Select, MenuItem ,Avatar} from "@mui/material";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { styled, alpha, InputBase } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function ButtonAppBar({ setSportEvents }) {
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
-  const [userData, setUserData] = React.useState({});
+  const [userData, setUserData] = React.useState("");
   const [selectedSport, setSelectedSport] = React.useState(null); // Track the selected sport
+  const [email, setEmail] = React.useState("");
+  const [Username, setUsername] = React.useState("");
+  const Search = styled("div")(({ theme }) => ({
+    position: "relative",
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    "&:hover": {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      marginLeft: theme.spacing(1),
+      width: "auto",
+    },
+  }));
 
+  const SearchIconWrapper = styled("div")(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }));
+
+  const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: 'inherit',
+    width: '100%',
+    '& .MuiInputBase-input': {
+      padding: theme.spacing(1, 1, 1, 0),
+      // vertical padding + font size from searchIcon
+      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+      transition: theme.transitions.create('width'),
+      [theme.breakpoints.up('sm')]: {
+        width: '12ch',
+        '&:focus': {
+          width: '20ch',
+        },
+      },
+    },
+  }));
+  const handleSearchInputChange = (event) => {
+    const searchQuery = event.target.value;
+    console.log("Search query:", searchQuery);
+    handleSportSearch(searchQuery);   
+  };
+ 
   const toggleDrawer = (open) => (event) => {
+    
+   
     if (
       event.type === "keydown" &&
       (event.key === "Tab" || event.key === "Shift")
@@ -33,7 +86,7 @@ export default function ButtonAppBar({ setSportEvents }) {
   const handleLogin = () => {
     setIsLoginModalOpen(true);
   };
-
+  const navigate = useNavigate();
   const handleLogout = () => {
     // Clear user details from local storage and state
     localStorage.removeItem("userData");
@@ -47,9 +100,13 @@ export default function ButtonAppBar({ setSportEvents }) {
   useEffect(() => {
     // console.log("userData changed:", storedUserData);
     const storedUserData = localStorage.getItem("userData");
+    const email2 = localStorage.getItem("email");
+    setEmail(email2);
+    const Username = localStorage.getItem("username");
+    setUsername(Username);
     setUserData(storedUserData);
-    console.log(userData);
-  }, [isLoginModalOpen, userData]);
+    console.log(email);
+  }, [isLoginModalOpen, userData, email]);
 
   const handleSportChange = async (sport) => {
     setSelectedSport(sport);
@@ -80,31 +137,67 @@ export default function ButtonAppBar({ setSportEvents }) {
     }
     // Apply filter logic here
   };
+  const handleSportSearch = async (searchQuery) => {
+    try {
+      const response = await fetch("http://localhost:4000/searchEvents", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          searchQuery: searchQuery,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          setSportEvents(data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          return [];
+        });
+    } catch (error) {
+      console.error("Error occurred:", error);
+      // Handle errors
+    }
+    // Apply filter logic here
+  };
+  const handleMyPurchases = async () => {
+    // Assuming you have the user's email stored in userData
+    navigate("/mytickets");
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-            onClick={toggleDrawer(true)}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Avatar alt="Icon" src="https://as2.ftcdn.net/v2/jpg/07/47/19/61/1000_F_747196141_Mf69CGAyQNo6ilgzK0m1IOjGSPviFOrd.jpg" sx={{ marginRight: '10px' }} />
+
+          <Typography variant="h6" component="div" align="left" sx={{ flexGrow: 1 }}>
             SportsHub
           </Typography>
+          {userData ? (
+            <><Button color="inherit" onClick={handleMyPurchases}>
+            My Purchases
+          </Button></>):(null)}
           {/* Replace buttons with Select dropdown */}
+          <Search sx={{ marginRight: "10px" }}>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search…"
+              inputProps={{ "aria-label": "search" }}
+              onClick={handleSearchInputChange}
+            />
+          </Search>
           <Select
             value={selectedSport}
             onChange={(e) => handleSportChange(e.target.value)}
             displayEmpty
             inputProps={{ "aria-label": "Select a sport" }}
-            sx={{
+            sx={{marginLeft: '10px',
               minWidth: 120,
               "& .MuiSelect-select": {
                 color: "white", // Change text color of selected value to white
@@ -119,18 +212,19 @@ export default function ButtonAppBar({ setSportEvents }) {
           </Select>
           {userData ? (
             <>
-              <Typography variant="body1" sx={{ mr: 2 }}>
-                {"Rishit Pallav"}
+              <Typography sx={{ mr: 2 ,marginLeft: '10px'}} variant="body1" >
+              {Username}
               </Typography>
-              <Button color="inherit" onClick={handleLogout}>
+              <Button color="inherit" sx={{ mr: 2 ,marginLeft: '10px'}} onClick={handleLogout}>
                 Logout
               </Button>
             </>
           ) : (
-            <Button color="inherit" onClick={handleLogin}>
+            <Button color="inherit" sx={{ mr: 2 ,marginLeft: '10px'}} onClick={handleLogin}>
               Login
             </Button>
           )}
+          
         </Toolbar>
       </AppBar>
       <Drawer
