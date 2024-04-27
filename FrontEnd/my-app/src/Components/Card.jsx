@@ -2,18 +2,38 @@ import React, { useState } from "react";
 import { CardActions, Button, Dialog, DialogContent } from "@mui/material";
 import ConfirmationPage from "./ConfirmationPage";
 import { useNavigate } from "react-router-dom";
-
-const Card = ({ name, image, type, stadium, Date, Time, onClick, id }) => {
+import ViewonMapModal from "./ViewonMapModal";
+import { Modal } from "@mui/material";
+import { Box } from "@mui/material";
+const Card = ({
+  name,
+  image,
+  type,
+  stadium,
+  Date,
+  Time,
+  onClick,
+  id,
+  latitude,
+  longitude,
+}) => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+
+  const handleMapClick = () => {
+    console.log(id);
+    console.log(latitude);
+    console.log(longitude);
+    setOpen(true); // This directly opens the modal
+  };
+
+  const handleOpenModal = () => {
+    setOpen(true);
+  };
 
   const handleClick = () => {
     console.log(id);
     navigate("/viewevent", { state: { id } });
-  };
-  const [open, setOpen] = useState(false);
-
-  const handleButtonClick = () => {
-    setOpen(true);
   };
 
   const handleClose = () => {
@@ -71,9 +91,9 @@ const Card = ({ name, image, type, stadium, Date, Time, onClick, id }) => {
   };
 
   return (
-    <div style={cardStyle} onClick={handleClick}>
+    <div style={cardStyle}>
       <img src={image} alt={name} style={cardImageStyle} />
-      <div style={cardContentStyle}>
+      <div style={cardContentStyle} onClick={handleClick}>
         <h4 style={cardTitleStyle}>{name}</h4>
         <p style={cardTypeStyle}>{type}</p>
         {stadium && <p style={cardTypeStyle}>{stadium}</p>}
@@ -87,13 +107,44 @@ const Card = ({ name, image, type, stadium, Date, Time, onClick, id }) => {
               size="small"
               style={buttonStyle}
               sx={{ "&:hover": buttonHoverStyle }}
-              onClick={handleButtonClick}
+              onClick={handleClick}
             >
               Buy Ticket
             </Button>
           </CardActions>
         </div>
       </div>
+      <Button onClick={handleMapClick}>View Location on Map</Button>
+      {/* <ViewonMapModal open={false} onClose={handleClose} /> */}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            minWidth: 1200,
+            overflowY: "auto",
+            borderRadius: 4,
+          }}
+        >
+          <ViewonMapModal
+            open={open}
+            onClose={handleClose}
+            latitude={latitude}
+            longitude={longitude}
+            name={name}
+          />
+        </Box>
+      </Modal>
     </div>
   );
 };
