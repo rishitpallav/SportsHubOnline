@@ -720,7 +720,7 @@ getOpenAIStadiumSections = async (stadiumName) => {
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo-16k",
       messages: message,
-      max_tokens: 100,
+      max_tokens: 10000,
       temperature: 0.5,
       top_p: 1,
     });

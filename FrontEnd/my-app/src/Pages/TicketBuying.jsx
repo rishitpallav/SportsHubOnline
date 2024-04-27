@@ -70,6 +70,7 @@ const YourComponent = () => {
         eventData: responseData,
         numberOfTickets: selectedNumberOfTickets,
         totalPrice: calculateTicketPrice(),
+        selectedLevel: selectedLevel,
       },
       replace: true, // Use replace to apply transition effect
     });
