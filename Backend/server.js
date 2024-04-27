@@ -51,7 +51,7 @@ app.use(bodyParser.json());
  */
 
 const openWeatherMapAPI = "70e49117b80f210af90236e6189abc4a";
-const ticketMasterAPI = "PjDo2OxtmjYpBdk3gi7TgXmNhWSXaxQm";
+const ticketMasterAPI = "DxQQS7OAGLc5WdofeZykpBPRt7LABUPy";
 const openAIAPIKey = "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";
 
 const allSportEventSeatMap = new Map();
