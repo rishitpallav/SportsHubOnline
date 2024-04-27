@@ -45,6 +45,7 @@ export default function Checkout({
   eventData,
   numberOfTickets,
   totalPrice,
+  handleViewOrders,
 }) {
   const [mode, setMode] = React.useState("light");
   const defaultTheme = createTheme({ palette: { mode } });
@@ -70,7 +71,8 @@ export default function Checkout({
   const handlePlaceOrder = () => {
     // Log the order information
     setOpen(true);
-    console.log("Order Information:", formData);
+    // console.log("Order Information:", formData);
+    handleViewOrders(formData);
     // return (
     //   <ConfirmationPage
     //     eventName={eventData.name}
