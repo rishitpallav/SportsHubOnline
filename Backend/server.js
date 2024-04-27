@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const { Client } = require("@elastic/elasticsearch");
 const OpenAI = require("openai");
 const client = require("./elasticsearch/client");
+const QRCode = require("qrcode");
 
 const SportEvent = require("./SportEvent");
 const Stadium = require("./Stadium");
@@ -342,7 +343,14 @@ app.post("/purchaseTicket", async (request, response) => {
     },
   });
 
-  sendPurchaseConfirmation(customer, event, section, price, numTickets);
+  sendPurchaseConfirmation(
+    ticketId,
+    customer,
+    event,
+    section,
+    price,
+    numTickets
+  );
   console.log("payment info recieved");
   response.status(200).send(body);
 });
@@ -793,7 +801,17 @@ registerCustomer = async (customer) => {
   }
 };
 
+async function getQRCode(data) {
+  try {
+    let qrCode = await QRCode.toDataURL(data);
+    return qrCode;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 sendPurchaseConfirmation = async (
+  ticketId,
   customer,
   event,
   section,
@@ -801,6 +819,10 @@ sendPurchaseConfirmation = async (
   numTickets
 ) => {
   try {
+    let qrCode = await getQRCode(
+      `TicketId: ${ticketId}, Event: ${event.name}, Section: ${section}, Price: $${price}, Number of Tickets: ${numTickets}`
+    );
+    let eventImage = event.image;
     let message = `
     <!DOCTYPE html>
 <html lang="en">
@@ -867,6 +889,15 @@ sendPurchaseConfirmation = async (
     .footer p {
       font-size: 14px;
     }
+    .qr-code {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .event-image {
+      display: block;
+      margin: 20px auto;
+      max-width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -895,6 +926,7 @@ sendPurchaseConfirmation = async (
         </table>
       </div>
       <p>Thank you for your purchase!</p>
+      <img src="${eventImage}" alt="Event Image" class="event-image" width=200 height=200>
     </div>
     <div class="footer">
       <p>&copy; 2024 Sports Hub Online</p>
@@ -902,20 +934,29 @@ sendPurchaseConfirmation = async (
   </div>
 </body>
 </html>
-
-
     `;
+
+    let qrCodeImageBuffer = Buffer.from(qrCode.split(",")[1], "base64");
+    let attachments = [
+      {
+        filename: "ticket_qr_code.png",
+        content: qrCodeImageBuffer,
+        contentType: "image/png",
+      },
+    ];
+
     await sendEmail(
       customer.credentials.email,
       "Ticket Purchase Confirmation",
-      message
+      message,
+      attachments
     );
   } catch (error) {
     console.log(error);
   }
 };
 
-sendEmail = async (email, subject, message) => {
+sendEmail = async (email, subject, message, attachments) => {
   try {
     let transporter = nodemailer.createTransport({
       service: "gmail",
@@ -930,6 +971,7 @@ sendEmail = async (email, subject, message) => {
       to: email,
       subject: subject,
       html: message,
+      attachments: attachments,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
