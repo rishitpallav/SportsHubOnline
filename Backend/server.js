@@ -270,7 +270,7 @@ app.post("/registerCustomer", async (request, response) => {
     tickets,
     cardInformation
   );
-   const body = await registerCustomer(customer);
+  const body = await registerCustomer(customer);
   response.status(200).send(body);
 });
 
@@ -317,6 +317,7 @@ app.post("/purchaseTicket", async (request, response) => {
     eventId: event.id,
     eventName: event.name,
     eventDate: event.startDate,
+    eventImage: event.image,
     section: section,
     price: price,
     numTickets: numTickets,
