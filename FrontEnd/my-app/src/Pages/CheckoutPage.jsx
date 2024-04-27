@@ -24,7 +24,7 @@ const Checkout = () => {
         numTickets: numberOfTickets,
         price: totalPrice,
         section: selectedLevel,
-        tickedId: randomTicketId,
+        ticketId: randomTicketId,
         email: email,
       }),
     }).then((response) => response.json());

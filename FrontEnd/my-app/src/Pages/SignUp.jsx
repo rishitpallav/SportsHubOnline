@@ -70,6 +70,18 @@ export default function SignUp() {
 
       if (response.ok) {
         // Handle successful signup
+        const dataresponse = {
+          name: data.getAll("firstName")[0] + " " + data.getAll("lastName")[0],
+          email: data.getAll("email")[0],
+        };
+        const serializedData = JSON.stringify(dataresponse);
+        localStorage.setItem("userData", serializedData);
+        localStorage.setItem("username", data.getAll("firstName")[0] + " " + data.getAll("lastName")[0]);
+        
+        // console.log(data.credentials.email);
+        localStorage.setItem("email", data.getAll("email")[0]);
+        const retrievedData = localStorage.getItem("username");
+        console.log(retrievedData);
         console.log("Signup successful");
         toast.success("Signup successful");
         navigate("/");

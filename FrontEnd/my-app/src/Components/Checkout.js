@@ -1,6 +1,5 @@
-import React from "react";
 import PropTypes from "prop-types";
-
+import React, { useRef } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -52,6 +51,7 @@ export default function Checkout({
   const [activeStep, setActiveStep] = React.useState(0);
   const [orderInfo, setOrderInfo] = React.useState({});
   const [open, setOpen] = useState(false); // State to control the dialog open/close
+  const backButtonRef = useRef(null); // Ref for the "Back to Home" button
 
   const toggleColorMode = () => {
     setMode((prev) => (prev === "dark" ? "light" : "dark"));
@@ -66,8 +66,13 @@ export default function Checkout({
   };
   const handleClose = () => {
     setOpen(false); // Close the dialog
+    clickBackToHome();
   };
-
+const clickBackToHome = () => {
+    if (backButtonRef.current) {
+      backButtonRef.current.click();
+    }
+  };
   const handlePlaceOrder = () => {
     // Log the order information
     setOpen(true);
@@ -174,7 +179,8 @@ export default function Checkout({
               height: 150,
             }}
           >
-            <Button
+           <Button
+           ref={backButtonRef}
               startIcon={<ArrowBackRoundedIcon />}
               component="a"
               href="http://localhost:3000"
@@ -345,8 +351,7 @@ export default function Checkout({
                 <Typography variant="h1">🎫</Typography>
                 <Typography variant="h5">Thank you for your order!</Typography>
                 <Typography variant="body1" color="text.secondary">
-                  Your order number is
-                  <strong>&nbsp;#140396</strong>. We have emailed your Ticket
+                  Your Booking is Confirmed. We have emailed your Ticket
                   confirmation and will notify you once the event is about to
                   start
                 </Typography>
@@ -360,16 +365,7 @@ export default function Checkout({
                 >
                   View Order QR Code
                 </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => handleHomeChange()}
-                  sx={{
-                    alignSelf: "start",
-                    width: { xs: "100%", sm: "auto" },
-                  }}
-                >
-                  GO to home page
-                </Button>
+                
               </Stack>
             ) : (
               <React.Fragment>
