@@ -342,7 +342,7 @@ app.post("/purchaseTicket", async (request, response) => {
   });
 
   sendPurchaseConfirmation(customer, event, section, price, numTickets);
-
+  console.log("payment info recieved");
   response.status(200).send(body);
 });
 

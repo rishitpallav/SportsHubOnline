@@ -6,6 +6,29 @@ import { useState } from "react";
 
 const Checkout = () => {
   const [randomTicketId, setrandomTicketId] = useState(null);
+  const sendpayment = async (
+    eventData,
+    numberOfTickets,
+    totalPrice,
+    selectedLevel,
+    randomTicketId,
+    email
+  ) => {
+    const response = fetch("http://localhost:4000/purchaseTicket", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        event: eventData,
+        numTickets: numberOfTickets,
+        price: totalPrice,
+        section: selectedLevel,
+        tickedId: randomTicketId,
+        email: email,
+      }),
+    }).then((response) => response.json());
+  };
 
   const location = useLocation();
   const generateTicketNumber = async () => {
@@ -20,9 +43,16 @@ const Checkout = () => {
   // Function to handle logging of order information
   const handleViewOrders = (orderInfo) => {
     // Log the order information
-    console.log("Order Information:", orderInfo, randomTicketId);
-    console.log("RANDOM" + randomTicketId);
     generateTicketNumber(randomTicketId);
+    const email = localStorage.getItem("email");
+    sendpayment(
+      eventData,
+      numberOfTickets,
+      totalPrice,
+      selectedLevel,
+      randomTicketId,
+      email
+    );
     // Here you can add logic to navigate to the orders page or perform any other action
   };
 
@@ -33,6 +63,7 @@ const Checkout = () => {
         eventData={eventData}
         numberOfTickets={numberOfTickets}
         totalPrice={totalPrice}
+        handleViewOrders={handleViewOrders}
       />
     </div>
   );

@@ -41,6 +41,8 @@ function SignIn(props) {
           };
           const serializedData = JSON.stringify(dataresponse);
           localStorage.setItem("userData", serializedData);
+          // console.log(data.credentials.email);
+          localStorage.setItem("email", data.credentials.email);
           const retrievedData = localStorage.getItem("userData");
           console.log(retrievedData);
           handleCloseLoginModal();
