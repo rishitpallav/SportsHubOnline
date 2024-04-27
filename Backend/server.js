@@ -625,7 +625,7 @@ getStadiumAdditionalInfo = async (stadium, type) => {
     sections = JSON.parse(sectionsResponse);
     if (
       "https://content.resale.ticketmaster.com" ==
-      stadium.seatMapUrl.substring(0, 40)
+      stadium.seatMapUrl.substring(0, 39)
     ) {
       seatmap = allSportEventSeatMap.get(type);
     } else {
