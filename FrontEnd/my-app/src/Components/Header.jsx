@@ -11,13 +11,14 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import LoginPage from "./LoginModal";
-import { Modal } from "@mui/material";
+import { Modal, Select, MenuItem } from "@mui/material";
 import { useEffect } from "react";
 
-export default function ButtonAppBar() {
+export default function ButtonAppBar({ setSportEvents }) {
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
   const [userData, setUserData] = React.useState({});
+  const [selectedSport, setSelectedSport] = React.useState(null); // Track the selected sport
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -48,7 +49,37 @@ export default function ButtonAppBar() {
     const storedUserData = localStorage.getItem("userData");
     setUserData(storedUserData);
     console.log(userData);
-  }, [isLoginModalOpen]);
+  }, [isLoginModalOpen, userData]);
+
+  const handleSportChange = async (sport) => {
+    setSelectedSport(sport);
+    try {
+      const response = await fetch("http://localhost:4000/sportEvents", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          city: "",
+          sportType: sport,
+          startPage: 0,
+          endPage: 20,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setSportEvents(data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          return [];
+        });
+    } catch (error) {
+      console.error("Error occurred:", error);
+      // Handle errors
+    }
+    // Apply filter logic here
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -67,10 +98,29 @@ export default function ButtonAppBar() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             SportsHub
           </Typography>
+          {/* Replace buttons with Select dropdown */}
+          <Select
+            value={selectedSport}
+            onChange={(e) => handleSportChange(e.target.value)}
+            displayEmpty
+            inputProps={{ "aria-label": "Select a sport" }}
+            sx={{
+              minWidth: 120,
+              "& .MuiSelect-select": {
+                color: "white", // Change text color of selected value to white
+              },
+            }}
+          >
+            <MenuItem value={null}>All Sports</MenuItem>
+            <MenuItem value="Baseball">Baseball</MenuItem>
+            <MenuItem value="Basketball">Basketball</MenuItem>
+            <MenuItem value="Soccer">Soccer</MenuItem>
+            <MenuItem value="Football">Football</MenuItem>
+          </Select>
           {userData ? (
             <>
               <Typography variant="body1" sx={{ mr: 2 }}>
-                {"Rishit"}
+                {"Rishit Pallav"}
               </Typography>
               <Button color="inherit" onClick={handleLogout}>
                 Logout

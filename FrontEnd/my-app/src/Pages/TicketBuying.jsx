@@ -95,109 +95,113 @@ const YourComponent = () => {
   };
 
   return (
-    <div className="container" style={{ marginTop: "50px" }}>
+    <>
       <Header />
-      <div className="row">
-        {responseData && responseData.stadium && (
-          <div className="col-md-6">
-            <div className="seat-map-container">
-              <img
-                src={responseData.stadium.seatMapUrl}
-                alt="Seat Map"
-                className="img-fluid seat-map-image"
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="col-md-6">
-          <div className="ticket-info-container">
-            {responseData && (
-              <div className="event-details-box">
-                <h2 className="event-title">{responseData.name}</h2>
-                <div className="event-details">
-                  <p className="event-info">
-                    <span className="info-label">Type:</span>{" "}
-                    {responseData.type}
-                  </p>
-                  <p className="event-info">
-                    <span className="info-label">Location:</span>{" "}
-                    {responseData.stadium.name}, {responseData.stadium.city},{" "}
-                    {responseData.stadium.state}, {responseData.stadium.country}
-                  </p>
-                  <p className="event-info">
-                    <span className="info-label">Date:</span>{" "}
-                    {responseData.startDate}
-                  </p>
-                  <p className="event-info">
-                    <span className="info-label">Start Time:</span>{" "}
-                    {responseData.startTime}
-                  </p>
-                  <p className="event-info">
-                    <span className="info-label">Price Range:</span> $
-                    {responseData.minPriceRange} - ${responseData.maxPriceRange}
-                  </p>
-                  <p className="event-info">
-                    <span className="info-label">Ticket Limit:</span>{" "}
-                    {responseData.ticketLimit && responseData.ticketLimit.info
-                      ? responseData.ticketLimit.info
-                      : "10"}
-                  </p>
-                </div>
-                {/* Ticket Selection Panel */}
-                <div className="ticket-selection-panel">
-                  <div className="form-group">
-                    <label htmlFor="levelSelect">Select Level:</label>
-                    <select
-                      id="levelSelect"
-                      className="form-control"
-                      onChange={handleLevelChange}
-                      value={selectedLevel}
-                    >
-                      {responseData.stadium.sections.map((section) => (
-                        <option key={section} value={section}>
-                          {section}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="numberOfTicketsSelect">
-                      Select Number of Tickets (Max {maxNumberOfTickets}):
-                    </label>
-                    <select
-                      id="numberOfTicketsSelect"
-                      className="form-control"
-                      onChange={handleNumberOfTicketsChange}
-                      value={selectedNumberOfTickets}
-                    >
-                      {[...Array(maxNumberOfTickets)].map((_, index) => (
-                        <option key={index + 1} value={index + 1}>
-                          {index + 1}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <p className="event-info">
-                    <span className="info-label">Total Price:</span> $
-                    {calculateTicketPrice()}
-                  </p>
-                  {/* Purchase Tickets Button */}
-                  <button
-                    className="btn btn-primary purchase-btn"
-                    onClick={handlePurchase}
-                  >
-                    Purchase Tickets
-                  </button>
-                </div>
+      <div className="container" style={{ marginTop: "50px" }}>
+        <div className="row">
+          {responseData && responseData.stadium && (
+            <div className="col-md-6">
+              <div className="seat-map-container">
+                <img
+                  src={responseData.stadium.seatMapUrl}
+                  alt="Seat Map"
+                  className="img-fluid seat-map-image"
+                />
               </div>
-            )}
-            {/* Render error message if an error occurred */}
-            {error && <p className="error-message">Error: {error.message}</p>}
+            </div>
+          )}
+
+          <div className="col-md-6">
+            <div className="ticket-info-container">
+              {responseData && (
+                <div className="event-details-box">
+                  <h2 className="event-title">{responseData.name}</h2>
+                  <div className="event-details">
+                    <p className="event-info">
+                      <span className="info-label">Type:</span>{" "}
+                      {responseData.type}
+                    </p>
+                    <p className="event-info">
+                      <span className="info-label">Location:</span>{" "}
+                      {responseData.stadium.name}, {responseData.stadium.city},{" "}
+                      {responseData.stadium.state},{" "}
+                      {responseData.stadium.country}
+                    </p>
+                    <p className="event-info">
+                      <span className="info-label">Date:</span>{" "}
+                      {responseData.startDate}
+                    </p>
+                    <p className="event-info">
+                      <span className="info-label">Start Time:</span>{" "}
+                      {responseData.startTime}
+                    </p>
+                    <p className="event-info">
+                      <span className="info-label">Price Range:</span> $
+                      {responseData.minPriceRange} - $
+                      {responseData.maxPriceRange}
+                    </p>
+                    <p className="event-info">
+                      <span className="info-label">Ticket Limit:</span>{" "}
+                      {responseData.ticketLimit && responseData.ticketLimit.info
+                        ? responseData.ticketLimit.info
+                        : "10"}
+                    </p>
+                  </div>
+                  {/* Ticket Selection Panel */}
+                  <div className="ticket-selection-panel">
+                    <div className="form-group">
+                      <label htmlFor="levelSelect">Select Level:</label>
+                      <select
+                        id="levelSelect"
+                        className="form-control"
+                        onChange={handleLevelChange}
+                        value={selectedLevel}
+                      >
+                        {responseData.stadium.sections.map((section) => (
+                          <option key={section} value={section}>
+                            {section}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="numberOfTicketsSelect">
+                        Select Number of Tickets (Max {maxNumberOfTickets}):
+                      </label>
+                      <select
+                        id="numberOfTicketsSelect"
+                        className="form-control"
+                        onChange={handleNumberOfTicketsChange}
+                        value={selectedNumberOfTickets}
+                      >
+                        {[...Array(maxNumberOfTickets)].map((_, index) => (
+                          <option key={index + 1} value={index + 1}>
+                            {index + 1}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <p className="event-info">
+                      <span className="info-label">Total Price:</span> $
+                      {calculateTicketPrice()}
+                    </p>
+                    {/* Purchase Tickets Button */}
+                    <button
+                      className="btn btn-primary purchase-btn"
+                      onClick={handlePurchase}
+                    >
+                      Purchase Tickets
+                    </button>
+                  </div>
+                </div>
+              )}
+              {/* Render error message if an error occurred */}
+              {error && <p className="error-message">Error: {error.message}</p>}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
