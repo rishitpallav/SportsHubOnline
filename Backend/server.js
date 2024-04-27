@@ -270,7 +270,7 @@ app.post("/registerCustomer", async (request, response) => {
     tickets,
     cardInformation
   );
-  // const body = await registerCustomer(customer);
+   const body = await registerCustomer(customer);
   response.status(200).send(body);
 });
 
