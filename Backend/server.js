@@ -51,9 +51,9 @@ app.use(bodyParser.json());
  *
  */
 
-const openWeatherMapAPI = "70e49117b80f210af90236e6189abc4a";
-const ticketMasterAPI = "DxQQS7OAGLc5WdofeZykpBPRt7LABUPy";
-const openAIAPIKey = "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";
+const openWeatherMapAPI = "OPENWEATHERMAP-API";
+const ticketMasterAPI = "TicketMaster-API";
+const openAIAPIKey = "OPENAI-API";
 
 const allSportEventSeatMap = new Map();
 allSportEventSeatMap.set(
@@ -76,6 +76,8 @@ allSportEventSeatMap.set(
   "Hockey",
   "https://mapsapi.tmol.io/maps/geometry/3/event/01006073B35531F2/staticImage?systemId=HOST&sectionLevel=true&app=PRD2663_EDP_NA&sectionColor=727272&avertaFonts=true"
 );
+
+let featuredSportEvents = [];
 
 // declaring OpenAI funtions
 // const elasticClient = new Client({
@@ -214,8 +216,13 @@ app.get("/featuredSports", async (request, response) => {
   // getSportEvents("", "sport", 0, 5).then((sportEvents) => {
   //   response.status(200).send(sportEvents);
   // });
-  const sportEvents = await getSportEvents("", "sport", 0, 5);
+  let sportEvents = await getSportEvents("", "sport", 0, 5);
   // console.log(sportEvents);
+  if (sportEvents.length > 0) {
+    featuredSportEvents = sportEvents;
+  } else {
+    sportEvents = featuredSportEvents;
+  }
   response.status(200).send(sportEvents);
 });
 
@@ -557,6 +564,9 @@ getEventDetails = async (eventId) => {
     `https://app.ticketmaster.com/discovery/v2/events/${eventId}.json?apikey=${ticketMasterAPI}`
   );
   const eventResponse = await responses.json();
+  if (!eventResponse._embedded) {
+    return null;
+  }
   let classification = eventResponse.classifications
     ? eventResponse.classifications[0].genre.name
     : "";
@@ -616,6 +626,10 @@ getStadiumAdditionalInfo = async (stadium, type) => {
   let id = stadium.id;
   let name = stadium.name;
   let seatmap = stadium.seatMapUrl;
+
+  if (id == null || name == null || seatmap == null) {
+    return stadium;
+  }
 
   const body = await client.search({
     index: "stadiums",
@@ -719,7 +733,7 @@ getOpenAIStadiumSections = async (stadiumName) => {
       {
         role: "system",
         content:
-          "You are a Stadium Seating Sections returning bot. I will be giving you a stadium name and you should return an array with the all the Sections present in the stadium. Do not just return levels, return with numbers.",
+          'You are a Stadium Seating Sections returning bot. I will be giving you a stadium name and you should return a array with the all the Sections present in the stadium. If there are a lot of sections, return with the most common sections. If you are not sure, return a array of ["100", "200", "300"]',
       },
       {
         role: "user",
@@ -740,6 +754,10 @@ getOpenAIStadiumSections = async (stadiumName) => {
 };
 
 searchEvents = async (searchQuery) => {
+  if (searchQuery == null || searchQuery == "") {
+    return [];
+  }
+
   const responses = await fetch(
     `https://app.ticketmaster.com/discovery/v2/events.json?keyword=${searchQuery}&apikey=${ticketMasterAPI}`
   );
@@ -747,6 +765,10 @@ searchEvents = async (searchQuery) => {
   let sportEvents = [];
 
   for (let event of ticketMasterResponse._embedded.events) {
+    if (event._embedded == null) {
+      continue;
+    }
+
     let classification = event.classifications
       ? event.classifications[0].genre.name
       : "";

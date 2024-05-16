@@ -46,22 +46,19 @@ const MainPage = () => {
         console.log(data);
 
         // Send the city to the sportevents endpoint
-        // const Rresponse = await fetch("http://localhost:4000/recommendEvents", {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({
-        //     ipJson: ipJson,
-
-        //   }),
-        // }
-
-        // );
-        // const rdata = await Rresponse.json();
-        // // Update the sportEvents state with the fetched data
-        // setRSportEvents(rdata);
-        // console.log("recommended: ",rdata);
+        const Rresponse = await fetch("http://localhost:4000/recommendEvents", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ipJson: ipJson,
+          }),
+        });
+        const rdata = await Rresponse.json();
+        // Update the sportEvents state with the fetched data
+        setRSportEvents(rdata);
+        console.log("recommended: ", rdata);
       } catch (error) {
         console.error("Error fetching user's city:", error);
         // Update the error state if there's an error
@@ -93,7 +90,7 @@ const MainPage = () => {
       <FeaturedTickets style={{ marginTop: "20px" }} events={Featuredevents} />
       <div style={{ width: "100%", margin: "40px", textAlign: "center" }}>
         <h2>
-          <b>Recommended Events Based on Location and Weather</b>
+          <b>Recommended Events by AI Based on Location and Weather</b>
         </h2>
       </div>
       <div
@@ -110,7 +107,7 @@ const MainPage = () => {
       >
         {/* Rendering Card components for each sports event */}
 
-        {sportEvents.map((event, index) => (
+        {rsportEvents.map((event, index) => (
           <Card
             key={index}
             name={event.name}

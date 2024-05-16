@@ -11,7 +11,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import LoginPage from "./LoginModal";
-import { Modal, Select, MenuItem ,Avatar} from "@mui/material";
+import { Modal, Select, MenuItem, Avatar } from "@mui/material";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled, alpha, InputBase } from "@mui/material";
@@ -50,17 +50,17 @@ export default function ButtonAppBar({ setSportEvents }) {
   }));
 
   const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    width: '100%',
-    '& .MuiInputBase-input': {
+    color: "inherit",
+    width: "100%",
+    "& .MuiInputBase-input": {
       padding: theme.spacing(1, 1, 1, 0),
       // vertical padding + font size from searchIcon
       paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      [theme.breakpoints.up('sm')]: {
-        width: '12ch',
-        '&:focus': {
-          width: '20ch',
+      transition: theme.transitions.create("width"),
+      [theme.breakpoints.up("sm")]: {
+        width: "12ch",
+        "&:focus": {
+          width: "20ch",
         },
       },
     },
@@ -68,12 +68,10 @@ export default function ButtonAppBar({ setSportEvents }) {
   const handleSearchInputChange = (event) => {
     const searchQuery = event.target.value;
     console.log("Search query:", searchQuery);
-    handleSportSearch(searchQuery);   
+    handleSportSearch(searchQuery);
   };
- 
+
   const toggleDrawer = (open) => (event) => {
-    
-   
     if (
       event.type === "keydown" &&
       (event.key === "Tab" || event.key === "Shift")
@@ -168,36 +166,54 @@ export default function ButtonAppBar({ setSportEvents }) {
     navigate("/mytickets");
   };
 
+  const handleHome = () => {
+    navigate("/");
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-        <Avatar alt="Icon" src="https://as2.ftcdn.net/v2/jpg/07/47/19/61/1000_F_747196141_Mf69CGAyQNo6ilgzK0m1IOjGSPviFOrd.jpg" sx={{ marginRight: '10px' }} />
+          <Avatar
+            onClick={handleHome}
+            alt="Icon"
+            src="https://as2.ftcdn.net/v2/jpg/07/47/19/61/1000_F_747196141_Mf69CGAyQNo6ilgzK0m1IOjGSPviFOrd.jpg"
+            sx={{ marginRight: "10px" }}
+          />
 
-          <Typography variant="h6" component="div" align="left" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            component="div"
+            align="left"
+            sx={{ flexGrow: 1 }}
+          >
             SportsHub
           </Typography>
-          {userData ? (
-            <><Button color="inherit" onClick={handleMyPurchases}>
-            My Purchases
-          </Button></>):(null)}
           {/* Replace buttons with Select dropdown */}
-          <Search sx={{ marginRight: "10px" }}>
+          <Search sx={{ marginRight: "400px" }}>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ "aria-label": "search" }}
-              onClick={handleSearchInputChange}
+              onDoubleClick={handleSearchInputChange}
             />
           </Search>
+          {userData ? (
+            <>
+              <Button color="inherit" onClick={handleMyPurchases}>
+                My Purchases
+              </Button>
+            </>
+          ) : null}
           <Select
             value={selectedSport}
             onChange={(e) => handleSportChange(e.target.value)}
             displayEmpty
             inputProps={{ "aria-label": "Select a sport" }}
-            sx={{marginLeft: '10px',
+            sx={{
+              marginLeft: "10px",
               minWidth: 120,
               "& .MuiSelect-select": {
                 color: "white", // Change text color of selected value to white
@@ -212,19 +228,26 @@ export default function ButtonAppBar({ setSportEvents }) {
           </Select>
           {userData ? (
             <>
-              <Typography sx={{ mr: 2 ,marginLeft: '10px'}} variant="body1" >
-              {Username}
+              <Typography sx={{ mr: 2, marginLeft: "10px" }} variant="body1">
+                {Username}
               </Typography>
-              <Button color="inherit" sx={{ mr: 2 ,marginLeft: '10px'}} onClick={handleLogout}>
+              <Button
+                color="inherit"
+                sx={{ mr: 2, marginLeft: "10px" }}
+                onClick={handleLogout}
+              >
                 Logout
               </Button>
             </>
           ) : (
-            <Button color="inherit" sx={{ mr: 2 ,marginLeft: '10px'}} onClick={handleLogin}>
+            <Button
+              color="inherit"
+              sx={{ mr: 2, marginLeft: "10px" }}
+              onClick={handleLogin}
+            >
               Login
             </Button>
           )}
-          
         </Toolbar>
       </AppBar>
       <Drawer
