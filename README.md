@@ -1,5 +1,3 @@
-// write some readme
-
 ## SportsHub Online
 
 SportsHub Online is a web application that allows users purchase sports tickets online. It provides a platform for users to view available sports events, purchase tickets and view their order history. A QR code is generated for each ticket purchased and users can use it to gain access to the event. Emails are sent to users to confirm their purchase and provide them with the QR code.
