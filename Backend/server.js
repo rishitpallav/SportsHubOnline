@@ -983,13 +983,13 @@ sendEmail = async (email, subject, message, attachments) => {
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "rishitpallav6@gmail.com",
-        pass: "obpabqxlladiihgk",
+        user: "GMAIL",
+        pass: "PASS",
       },
     });
 
     let mailOptions = {
-      from: "rishitpallav6@gmail.com",
+      from: "GMAIL",
       to: email,
       subject: subject,
       html: message,
